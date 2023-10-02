@@ -1,3 +1,4 @@
+require("dotenv").config();
 const {DB } = require("../../lib/models");
 before(async () => {
 

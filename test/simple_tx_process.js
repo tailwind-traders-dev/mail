@@ -18,10 +18,10 @@ Exciting to be testing stuff.
       `
     });
     message = await Mail.prepare("test", "test@test.com");
-    console.log(message);
+    message = await Mail.send(message);
   });  
-  it("it will work", async function(){
-    assert(email.slug)
+  it("sends a message", async function(){
+    assert.strictEqual(message.receipt.messageId, 1)
   });
 });
 
