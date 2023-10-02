@@ -1,2 +1,2 @@
 test:
-	bun test
+	npm run test
