@@ -25,7 +25,11 @@ Exciting to be testing stuff.
   });
   it("is in the ready state", async function(){
     const ready = await Mail.process();
-    console.log(ready);
+    assert.strictEqual(1, ready.length);
+  });
+  it("the outbox is now empty", async function(){
+    const count = await Outbox.count();
+    assert.strictEqual(0, count)
   });
 });
 
