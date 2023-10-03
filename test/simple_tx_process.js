@@ -1,5 +1,5 @@
 
-const {DB, Email} = require("../lib/models");
+const {DB, Email, Outbox} = require("../lib/models");
 const Mail = require("../lib/mail");
 
 const assert = require("assert");
@@ -17,11 +17,11 @@ describe('A simple transactional email message', () => {
 Exciting to be testing stuff.
       `
     });
-    message = await Mail.prepare("test", "test@test.com");
-    message = await Mail.send(message);
+    message = await Mail.queue("test", "test@test.com");
   });  
-  it("sends a message", async function(){
-    assert.strictEqual(message.receipt.messageId, 1)
+  it("gets queued in the outbox", async function(){
+    const out = await Outbox.findOne({where: {messageId: message.id}});
+    assert(out)
   });
 });
 
