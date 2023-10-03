@@ -1,13 +1,13 @@
 
-const {DB, Email, Outbox} = require("../lib/models");
-const Mail = require("../lib/mail");
+const { Email, Outbox} = require("../lib/models");
+const {DB} = require("../lib/queues");
 
 const assert = require("assert");
 
 //The process here is the simplest one: we have an Email we want to send to a 
 //customer. We need the email template
 
-describe('A simple transactional email message', () => { 
+describe('The DB queue', () => { 
   let email=null, message=null;
   before(async function(){
     email = await Email.create({
@@ -17,14 +17,14 @@ describe('A simple transactional email message', () => {
 Exciting to be testing stuff.
       `
     });
-    message = await Mail.queue("test", "test@test.com");
+    message = await DB.queue("test", "test@test.com");
   });  
   it("gets queued in the outbox", async function(){
     const out = await Outbox.findOne({where: {messageId: message.id}});
     assert(out)
   });
   it("is in the ready state", async function(){
-    const ready = await Mail.process();
+    const ready = await DB.process();
     assert.strictEqual(1, ready.length);
   });
   it("the outbox is now empty", async function(){
