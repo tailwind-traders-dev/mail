@@ -23,5 +23,9 @@ Exciting to be testing stuff.
     const out = await Outbox.findOne({where: {messageId: message.id}});
     assert(out)
   });
+  it("is in the ready state", async function(){
+    const ready = await Mail.process();
+    console.log(ready);
+  });
 });
 
