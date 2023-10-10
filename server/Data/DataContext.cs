@@ -10,21 +10,19 @@ public class Db: DbContext
   public DbSet<Contact> Contacts { get; set; }
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
-      modelBuilder.Entity<Contact>().ToTable("mail.contacts");
+      modelBuilder.Entity<Contact>().ToTable("contacts");
   }
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
     //var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["MailApp"].ConnectionString;
     //var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
     //var connectionString = "Host=localhost;Database=tailwind;Username=rob;";
-    var envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-    Console.WriteLine(envName);
     var config= new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
     .AddJsonFile("appsettings.json")
     //.AddJsonFile($"appsettings.{envName}.json", optional: false)
     .Build();
     var connectionString = config.GetConnectionString("MailApp");
-
+Console.WriteLine(connectionString);
     optionsBuilder.UseNpgsql(connectionString);
   }
 }
