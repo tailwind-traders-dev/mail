@@ -1,0 +1,2 @@
+ASPNETCORE_ENVIRONMENT="Development"
+DATABASE_URL="postgres://localhost/tailwind"

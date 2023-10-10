@@ -1,28 +1,14 @@
 {
-  "name": "mail",
-  "version": "0.0.0",
-  "private": true,
+  "name": "minimal",
+  "version": "1.0.0",
+  "description": "The ASP.NET Svelte Starter Template with ASP.NET Minimal API, Svelte 3.0 and Tailwind",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www",
-    "test": "NODE_ENV=test mocha --recursive --require test/helpers --file ./test/helpers/setup.js"
+    "dev": "dotnet watch --project ./server",
+    "start": "dotnet run --project ./server",
+    "postinstall": "cd app && npm install"
   },
-  "dependencies": {
-    "bull": "^4.11.3",
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "dotenv": "^16.3.1",
-    "ejs": "~2.6.1",
-    "express": "~4.16.1",
-    "front-matter": "^4.0.2",
-    "http-errors": "~1.6.3",
-    "markdown-it": "^13.0.2",
-    "morgan": "~1.9.1",
-    "nodemailer": "^6.9.5",
-    "pg": "^8.11.3",
-    "sequelize": "^6.33.0",
-    "sqlite3": "^5.1.6"
-  },
-  "devDependencies": {
-    "mocha": "^10.2.0"
-  }
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
