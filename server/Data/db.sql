@@ -6,7 +6,9 @@ create table contacts(
   id serial primary key,
   email text not null unique,
   subscribed boolean not null default true,
-  name text 
+  name text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table groups(
@@ -21,7 +23,7 @@ create table tags(
   id serial not null primary key,
   slug text not null unique,
   name text,
-  desctiption text,
+  description text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

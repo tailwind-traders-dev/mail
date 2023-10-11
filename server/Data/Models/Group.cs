@@ -3,15 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Tailwind.Mail.Data.Models;
 
-public class Contact
+public class Group
 {
     [Key]
     [Column("id")]
     public int ID { get; set; }
     [Column("name")]
     public string? Name { get; set; }
-    [Column("email")]
-    public string? Email { get; set; }
-    [Column("subscribed")]
-    public bool Subscribed { get; set; }
+    [Column("slug")]
+    public string? Slug { get; set; }
+    
 }
