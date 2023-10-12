@@ -25,10 +25,11 @@ public class Db: DbContext
   protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
   {
 
-    var config= new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-    .AddJsonFile("appsettings.json")
-    .Build();
-    var connectionString = config.GetConnectionString("MailApp");
+    // var config= new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    // .AddJsonFile("appsettings.json")
+    // .Build();
+    // var connectionString = config.GetConnectionString("MailApp");
+    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
     optionsBuilder.UseNpgsql(connectionString);
   }
 }

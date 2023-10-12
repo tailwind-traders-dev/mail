@@ -27,5 +27,5 @@ public class Message
     [Column("sent_at")]
     public DateTime? SentAt { get; set; }
     [Column("receipt")]
-    public JsonDocument? Receipt { get; set; }
+    public string? Receipt { get; set; }
 }

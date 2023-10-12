@@ -5,7 +5,7 @@ TEST_DB="Host=localhost;Database=tailwind;Username=rob;"
 db:
 	psql tailwind < "./Data/db.sql"
 
-test: db
+test: #db
 	dotnet test
 
 zip:

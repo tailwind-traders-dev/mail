@@ -1,10 +1,8 @@
-var root = Directory.GetCurrentDirectory();
-var dotenv = Path.Combine(root, ".env");
-DotEnv.Load(dotenv);
+DotEnv.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
- 
+
  
 //this serves our Svelte file
 //app.UseDefaultFiles().UseStaticFiles();
