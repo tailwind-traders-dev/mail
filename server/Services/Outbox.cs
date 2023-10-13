@@ -1,6 +1,8 @@
 namespace Tailwind.Mail.Services;
 using System.Net.Mail;
+using System.Net;
 using System.Text.Json;
+using System.Text.Encodings;
 using Tailwind.Mail.Data.Models;
 
 public interface IOutbox
@@ -14,18 +16,36 @@ public class Outbox : IOutbox
 
   public Outbox()
   {
-    //pull the SMTP stuff from settings
-    _client = new SmtpClient("localhost", 587);
+    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+     
+    var host = Environment.GetEnvironmentVariable("SMTP_HOST");
+    var user = Environment.GetEnvironmentVariable("SMTP_USER");
+    var pw = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
+    var port = 465;
+    if (env == "Integration"){
+      host="smtp.ethereal.email";
+      user = Environment.GetEnvironmentVariable("ETHEREAL_USER");
+      pw = Environment.GetEnvironmentVariable("ETHEREAL_PASSWORD");
+      port = 587;
+    }
+    Console.WriteLine($"host: {host}, user: {user}, pw: {pw}");
+    _client = new SmtpClient(host, port);
+    _client.Credentials = new NetworkCredential(user, pw);
+    _client.UseDefaultCredentials = false;
+    _client.EnableSsl = true;
   }
 
   public async Task<Message> SendNow(Message message)
   {
-    var sendMessage = new MailMessage();
+    var sendMessage = new MailMessage{
+      IsBodyHtml = true,
+      Subject = message.Subject,
+      Body = message.Html,
+      From=new MailAddress(message.SendFrom)
+
+    };
     
-    sendMessage.From = new MailAddress(message.SendFrom);
     sendMessage.To.Add(message.SendTo);
-    sendMessage.Subject = message.Subject;
-    sendMessage.Body = message.Html;
 
     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
      //ONLY SEND if we are in production or integration mode

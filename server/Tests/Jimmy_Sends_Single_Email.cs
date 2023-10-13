@@ -12,7 +12,6 @@ public class Jimmy_Sends_Single_Email:TestBase
   {
     //arrange
 
-
     var outbox = new Outbox();
     var message = new Message
     {

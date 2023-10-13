@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 
+//Based on the code from here, but I added the ability to just read the .ENV from the project root
 //https://dusted.codes/dotenv-in-dotnet
 public static class DotEnv
 {
@@ -11,7 +12,7 @@ public static class DotEnv
         var filePath = Path.Combine(projectDirectory, ".env");
         if (!File.Exists(filePath))
             return;
-        Console.WriteLine("Loading .env file");
+        //Console.WriteLine("Loading .env file");
         foreach (var line in File.ReadAllLines(filePath))
         {
 
@@ -21,7 +22,7 @@ public static class DotEnv
           
           if (parts.Length != 2)
               continue;
-          Console.WriteLine("Setting {0} to {1}", parts[0], parts[1]);
+          //Console.WriteLine("Setting {0} to {1}", parts[0], parts[1]);
           Environment.SetEnvironmentVariable(parts[0], parts[1].Replace("\"", ""));
         }
     }
