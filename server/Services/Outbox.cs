@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Encodings;
 using Tailwind.Mail.Data.Models;
 using Tailwind.Mail.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class Outbox 
 {
@@ -13,20 +14,23 @@ public class Outbox
   public static async Task Queue(Email email, ICollection<Contact> contacts, string from){
     //drops the message into the DB... somewhere?
     var _db = new Db();
+    var _messages = new List<Message>();
     foreach (var contact in contacts)
     {
       var message = new Message{
         Email = email,
+        Subject=email.Subject,
         SendTo = contact.Email,
         SendFrom = from,
         Status = "queued",
-        SendAt = DateTime.Now + TimeSpan.FromHours(email.DelayHours),
+        SendAt = DateTimeOffset.UtcNow + TimeSpan.FromHours(email.DelayHours),
         Html = email.Html,
       };
-      await _db.Messages.AddAsync(message);
+      _messages.Add(message);
     }
-
+    _db.AddRange(_messages);
     await _db.SaveChangesAsync();
+    await _db.Database.SqlQuery<int>($"NOTIFY messages, 'new sequence'").ToListAsync();
 
   }
 

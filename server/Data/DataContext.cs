@@ -40,6 +40,6 @@ public class Db: DbContext
     var db = Environment.GetEnvironmentVariable("DB_NAME");
     var connectionString = $"Host={host};Username={user};Password={pw};Database={db}";
 
-    optionsBuilder.UseNpgsql(connectionString).LogTo(Console.WriteLine, LogLevel.Information);;
+    optionsBuilder.UseNpgsql(connectionString);//.LogTo(Console.WriteLine, LogLevel.Information);
   }
 }

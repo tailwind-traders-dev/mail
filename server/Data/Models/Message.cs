@@ -22,6 +22,7 @@ public class Message
     public string? SendFrom { get; set; } 
     [Column("html")]
     public string? Html { get; set; }
+    
     [Column("send_at")]
     public DateTimeOffset? SendAt { get; set; }
     [Column("sent_at")]

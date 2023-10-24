@@ -74,7 +74,7 @@ create table messages(
   subject text not null,
   html text not null,
   send_at timestamptz,
-  sent_at timestamptz not null default now(),
+  sent_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
