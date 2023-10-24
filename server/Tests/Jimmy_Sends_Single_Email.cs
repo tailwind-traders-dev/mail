@@ -10,20 +10,20 @@ public class Jimmy_Sends_Single_Email:TestBase
   [Fact]
   public async Task The_email_is_sent()
   {
-    //arrange
-
-    var outbox = new Outbox();
-    var message = new Message
-    {
-      SendFrom = "test@test.com",
-      SendTo = "test@test.com",
+    var email = new Email{
+      Slug = "test",
+      Sequence=null,
       Subject = "Test",
-      Html = "<h1>Test</h1>"
+      Markdown = "# Test",
+      DelayHours = 0
     };
+    email.Render();
     //act
-    await outbox.SendNow(message);
+
+    var message = await Outbox.SendNow(email,"test@test.com","test@tailwindtraders.dev");
     //assert
     Assert.NotNull(message.SentAt);
+    Assert.Equal("sent",message.Status);
   }
 }
 

@@ -4,17 +4,33 @@ using System.Net;
 using System.Text.Json;
 using System.Text.Encodings;
 using Tailwind.Mail.Data.Models;
+using Tailwind.Mail.Data;
 
-public interface IOutbox
-{
-  Task<Message> SendNow(Message message);
-}
-
-public class Outbox : IOutbox
+public class Outbox 
 {
   private readonly SmtpClient _client;
 
-  public Outbox()
+  public static async Task Queue(Email email, ICollection<Contact> contacts, string from){
+    //drops the message into the DB... somewhere?
+    var _db = new Db();
+    foreach (var contact in contacts)
+    {
+      var message = new Message{
+        Email = email,
+        SendTo = contact.Email,
+        SendFrom = from,
+        Status = "queued",
+        SendAt = DateTime.Now + TimeSpan.FromHours(email.DelayHours),
+        Html = email.Html,
+      };
+      await _db.Messages.AddAsync(message);
+    }
+
+    await _db.SaveChangesAsync();
+
+  }
+
+  public static async Task<Message> SendNow(Email email, string to, string from)
   {
     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
      
@@ -28,35 +44,40 @@ public class Outbox : IOutbox
       pw = Environment.GetEnvironmentVariable("ETHEREAL_PASSWORD");
       port = 587;
     }
-    Console.WriteLine($"host: {host}, user: {user}, pw: {pw}");
-    _client = new SmtpClient(host, port);
+
+    var _client = new SmtpClient(host, port);
     _client.Credentials = new NetworkCredential(user, pw);
     _client.UseDefaultCredentials = false;
     _client.EnableSsl = true;
-  }
-
-  public async Task<Message> SendNow(Message message)
-  {
+    
     var sendMessage = new MailMessage{
       IsBodyHtml = true,
-      Subject = message.Subject,
-      Body = message.Html,
-      From=new MailAddress(message.SendFrom)
-
+      Subject = email.Subject,
+      Body = email.Html,
+      From=new MailAddress(from),
+      To = {new MailAddress(to)}
     };
     
-    sendMessage.To.Add(message.SendTo);
-
-    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-     //ONLY SEND if we are in production or integration mode
-    if (env == "Integration"){
+    if (env == "Integration" || env == "Production"){
       Console.WriteLine("Sending email");
       await _client.SendMailAsync(sendMessage);
-      //create a JSON document
-      var json = JsonSerializer.Serialize(new {thing="stuff"}); //TODO: make this a real receipt
-      message.Receipt = json;
+      //TODO: handle the receipt somehow!
+
     }
-    message.SentAt = DateTime.Now;
+    var _db = new Db();
+    var message = new Message{
+      Email = email,
+      SendTo = to,
+      SendFrom = from,
+      SentAt = DateTimeOffset.UtcNow,
+      Status = "sent",
+      Subject = email.Subject,
+      Html = email.Html,
+    };
+    
+    _db.Add(message);
+
+    await _db.SaveChangesAsync();
     return message;
   }
 

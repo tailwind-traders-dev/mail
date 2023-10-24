@@ -50,7 +50,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.0" />
     <PackageReference Include="YamlDotNet" Version="13.0.0" />
-    <PackageReference Include="Markdig" Version="0.30.4" />
+    <PackageReference Include="Markdig" Version="0.33.0" />
   </ItemGroup>
 
   <Target Name="PublishRunVite" AfterTargets="ComputeFilesToPublish">

@@ -28,13 +28,14 @@ create table tags(
   updated_at timestamptz not null default now()
 );
 
+--the people in our groups
 create table segments(
   contact_id int not null references contacts(id),
   group_id int not null references groups(id),
   primary key (contact_id, group_id)
 );
 
-create table contacts_tags(
+create table tagged(
   contact_id int not null references contacts(id),
   tag_id int not null references tags(id),
   primary key (contact_id, tag_id)
@@ -49,7 +50,8 @@ create table sequences(
   updated_at timestamptz not null default now()
 );
 
--- templates
+-- templates, which can belong to 0/n sequences. Transactionals don't have a sequence, but broadcasts
+-- are single-sequence emails as they need to have a title and description for tracking purposes
 create table emails(
   id serial not null primary key,
   sequence_id int references sequences(id),
@@ -66,15 +68,14 @@ create table emails(
 create table messages(
   id serial not null primary key,
   email_id int not null references emails(id),
+  status text not null default 'pending',
   send_to text not null,
   send_from text not null,
   subject text not null,
   html text not null,
   send_at timestamptz,
   sent_at timestamptz not null default now(),
-  receipt jsonb,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
-
 

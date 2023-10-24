@@ -9,13 +9,13 @@ public class Message
     [Key]
     [Column("id")]
     public int ID { get; set; }
-    [Column("name")]
-    public string? Name { get; set; }
     
     public Email? Email { get; set; }
-
     [Column("subject")]
     public string? Subject { get; set; }
+    [Column("status")]
+    public string? Status { get; set; } = "pending";
+
     [Column("send_to")]
     public string? SendTo { get; set; } 
     [Column("send_from")]
@@ -23,9 +23,7 @@ public class Message
     [Column("html")]
     public string? Html { get; set; }
     [Column("send_at")]
-    public DateTime? SendAt { get; set; }
+    public DateTimeOffset? SendAt { get; set; }
     [Column("sent_at")]
-    public DateTime? SentAt { get; set; }
-    [Column("receipt")]
-    public string? Receipt { get; set; }
+    public DateTimeOffset? SentAt { get; set; }
 }
