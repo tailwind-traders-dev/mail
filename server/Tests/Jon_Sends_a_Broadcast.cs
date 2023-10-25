@@ -27,9 +27,9 @@ public class Jon_Sends_a_Broadcast:TestBase
 
 
     var _contacts = new List<Contact>();
-    for(var i = 0; i < 10; i++){
+    for(var i = 0; i < 25000; i++){
       _contacts.Add(new Contact{
-        Email = $"test={i}@test.com"
+        Email = $"test{i}@test.com"
       });
     }
     await Outbox.Queue(email, _contacts, "test@tailwindtraders.dev");

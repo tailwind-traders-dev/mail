@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 public class Outbox 
 {
-  private readonly SmtpClient _client;
 
   public static async Task Queue(Email email, ICollection<Contact> contacts, string from){
     //drops the message into the DB... somewhere?
@@ -17,6 +16,8 @@ public class Outbox
     var _messages = new List<Message>();
     foreach (var contact in contacts)
     {
+      //probably need to do the rendering here so we can 
+      //add template variables, like name, data, etc
       var message = new Message{
         Email = email,
         Subject=email.Subject,
@@ -48,11 +49,6 @@ public class Outbox
       pw = Environment.GetEnvironmentVariable("ETHEREAL_PASSWORD");
       port = 587;
     }
-
-    var _client = new SmtpClient(host, port);
-    _client.Credentials = new NetworkCredential(user, pw);
-    _client.UseDefaultCredentials = false;
-    _client.EnableSsl = true;
     
     var sendMessage = new MailMessage{
       IsBodyHtml = true,
@@ -64,6 +60,10 @@ public class Outbox
     
     if (env == "Integration" || env == "Production"){
       Console.WriteLine("Sending email");
+      var _client = new SmtpClient(host, port);
+      _client.Credentials = new NetworkCredential(user, pw);
+      _client.UseDefaultCredentials = false;
+      _client.EnableSsl = true;
       await _client.SendMailAsync(sendMessage);
       //TODO: handle the receipt somehow!
 
