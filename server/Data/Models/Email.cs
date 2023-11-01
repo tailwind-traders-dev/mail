@@ -19,7 +19,7 @@ public class Email
     [NotMapped]
     public string? Html { get; set; } //this isn't in the DB and is rendered when/where needed
     public Sequence? Sequence { get; set; }
-    public ICollection<Message> Messages { get; }
+    //public ICollection<Message> Messages { get; }
 
     public void Render(){
       var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();

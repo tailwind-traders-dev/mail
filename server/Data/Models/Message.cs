@@ -9,12 +9,15 @@ public class Message
     [Key]
     [Column("id")]
     public int ID { get; set; }
-    
-    public Email? Email { get; set; }
+
     [Column("subject")]
     public string? Subject { get; set; }
     [Column("status")]
     public string? Status { get; set; } = "pending";
+    [Column("source")]
+    public string? Source { get; set; } = "broadcast";
+    [Column("slug")]
+    public string? Slug { get; set; }
 
     [Column("send_to")]
     public string? SendTo { get; set; } 
@@ -27,4 +30,6 @@ public class Message
     public DateTimeOffset? SendAt { get; set; }
     [Column("sent_at")]
     public DateTimeOffset? SentAt { get; set; }
+    [Column("created_at")]
+    public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

@@ -11,12 +11,10 @@ public class Jon_Sends_a_Broadcast:TestBase
   [Fact]
   public async Task ten_thousand_messages_are_queued()
   {
-    var sequence = new Sequence{
-      Name = "Test Broadcast",
-      Slug = "test-sequence"
-    };
+
+    var _db = new Db();
+
     var email = new Email{
-      Sequence = sequence,
       Slug = "test-broadcast",
       Subject = "Test",
       Markdown = "# Test",
@@ -25,6 +23,13 @@ public class Jon_Sends_a_Broadcast:TestBase
 
     email.Render();
 
+    var broadcast = new Broadcast{
+      Slug = "test-broadcast",
+      Name = "Test Broadcast",
+      ReplyTo = "test@test,com",
+      Email = email
+    };
+
 
     var _contacts = new List<Contact>();
     for(var i = 0; i < 25000; i++){
@@ -32,7 +37,10 @@ public class Jon_Sends_a_Broadcast:TestBase
         Email = $"test{i}@test.com"
       });
     }
-    await Outbox.Queue(email, _contacts, "test@tailwindtraders.dev");
+    // _db.Add(broadcast);
+    // _db.SaveChanges();
+
+    await Outbox.Queue(broadcast, _contacts);
   }
 }
 // public class ContactBasicTests {
