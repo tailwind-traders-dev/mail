@@ -13,4 +13,5 @@ public class Tag
     [Column("slug")]
     public string? Slug { get; set; }
     
+    public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
 }

@@ -12,35 +12,24 @@ public class Jon_Sends_a_Broadcast:TestBase
   public async Task ten_thousand_messages_are_queued()
   {
 
-    var _db = new Db();
+    //add 10,000 contacts with "Test" tag
+    var tag = new Tag{Name="Test", Slug="test"};
 
-    var email = new Email{
-      Slug = "test-broadcast",
-      Subject = "Test",
-      Markdown = "# Test",
-      DelayHours = 0
-    };
-
-    email.Render();
-
-    var broadcast = new Broadcast{
-      Slug = "test-broadcast",
-      Name = "Test Broadcast",
-      ReplyTo = "test@test,com",
-      Email = email
-    };
-
-
+    //create a list of contacts with the tag
     var _contacts = new List<Contact>();
-    for(var i = 0; i < 25000; i++){
-      _contacts.Add(new Contact{
-        Email = $"test{i}@test.com"
-      });
+    for(var i = 0; i < 10000; i++){
+      var c = new Contact{
+        Email = $"test{i}@test.com",
+        Subscribed = true
+      };
+      c.Tags.Add(tag);
+      _contacts.Add(c);
     }
-    // _db.Add(broadcast);
-    // _db.SaveChanges();
 
-    await Outbox.Queue(broadcast, _contacts);
+    var broadcast = Broadcast.Create("test","This is a test","# Hello");
+    var messages = Message.CreateForBroadcast(broadcast, _contacts);
+
+    broadcast = Outbox.Queue(broadcast, messages);
   }
 }
 // public class ContactBasicTests {

@@ -27,13 +27,13 @@ public class Db: DbContext
       modelBuilder.Entity<Email>().Property<int?>("SequenceId").HasColumnName("sequence_id");
       modelBuilder.Entity<Broadcast>().Property<int?>("EmailId").HasColumnName("email_id");
 
-      // modelBuilder.Entity<Broadcast>().HasMany(e => e.Recipients)
-      //                               .WithMany(e => e.Broadcasts)
-      //                               .UsingEntity<Dictionary<string, object>>(
-      //                                   "broadcast_recipients",
-      //                                   r => r.HasOne<Contact>().WithMany().HasForeignKey("contact_id"),
-      //                                   l => l.HasOne<Broadcast>().WithMany().HasForeignKey("broadcast_id")
-      //                               );
+      modelBuilder.Entity<Contact>().HasMany(e => e.Tags)
+                                    .WithMany(e => e.Contacts)
+                                    .UsingEntity<Dictionary<string, object>>(
+                                        "tagged",
+                                        r => r.HasOne<Tag>().WithMany().HasForeignKey("tag_id"),
+                                        l => l.HasOne<Contact>().WithMany().HasForeignKey("contact_id")
+                                    );
 
       // modelBuilder.Entity<Message>().Property<int?>("EmailId").HasColumnName("email_id");
   }

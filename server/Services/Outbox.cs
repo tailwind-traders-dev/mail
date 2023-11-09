@@ -10,33 +10,16 @@ using Microsoft.EntityFrameworkCore;
 public class Outbox 
 {
 
-  public static async Task Queue(Broadcast broadcast, ICollection<Contact> contacts){
-    //drops the message into the DB... somewhere?
+  public static Broadcast Queue(Broadcast broadcast, IList<Message> messages){
     var _db = new Db();
-    var _messages = new List<Message>();
-    var email = broadcast.Email;
-    foreach (var contact in contacts)
-    {
-      //probably need to do the rendering here so we can 
-      //add template variables, like name, data, etc
-      var message = new Message{
-        Subject = email.Subject,
-        Source = "broadcast",
-        Slug = broadcast.Slug,
-        SendTo = contact.Email,
-        SendFrom = broadcast.ReplyTo,
-        Status = "queued",
-        SendAt = DateTimeOffset.UtcNow + TimeSpan.FromHours(email.DelayHours),
-        Html = email.Html,
-      };
-      _messages.Add(message);
-    }
+    //update the status
+    broadcast.Status = "queued";
+    broadcast.MessageCount = messages.Count;
     _db.Add(broadcast);
-    _db.AddRange(contacts);
-    _db.AddRange(_messages);
-    await _db.SaveChangesAsync();
-    await _db.Database.SqlQuery<int>($"NOTIFY messages, 'new sequence'").ToListAsync();
-
+    _db.AddRange(messages); //this isn't a relation as it's a historical table
+    _db.SaveChanges();
+    _db.Database.SqlQuery<int>($"NOTIFY broadcasts, '{broadcast.Slug}'").ToListAsync();
+    return broadcast;
   }
 
   public static async Task<Message> SendNow(Email email, string to, string from)

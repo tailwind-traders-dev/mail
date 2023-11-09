@@ -77,6 +77,8 @@ create table broadcasts(
   id serial primary key,
   email_id int not null references emails(id),
   slug text not null unique,
+  status text not null default 'pending',
+  message_count int not null default 0,
   name text not null,
   reply_to text not null default 'noreply@tailwindtraders.dev',
   created_at timestamptz not null default now(),

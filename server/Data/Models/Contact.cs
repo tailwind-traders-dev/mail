@@ -15,4 +15,21 @@ public class Contact
     [Column("subscribed")]
     public bool Subscribed { get; set; }
 
+    public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public static IList<Contact> ByTag(Tag tag){
+      var _db = new Db();
+      var res =  _db.Contacts.Where(c => c.Subscribed).Where(c => c.Tags.Contains(tag)).ToList();
+      _db.Dispose();
+      return res;
+    }
+    public static IList<Contact> AllSubscribed(Tag tag){
+      var _db = new Db();
+      var res =  _db.Contacts.Where(c => c.Subscribed).ToList();
+      _db.Dispose();
+      return res;
+    }
+
+
+
 }

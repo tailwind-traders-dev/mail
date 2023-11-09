@@ -32,4 +32,27 @@ public class Message
     public DateTimeOffset? SentAt { get; set; }
     [Column("created_at")]
     public DateTimeOffset? CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+
+    public static IList<Message> CreateForBroadcast(Broadcast broadcast, ICollection<Contact> contacts){
+      var _messages = new List<Message>();
+      var email = broadcast.Email;
+      foreach (var contact in contacts)
+      {
+        //probably need to do the rendering here so we can 
+        //add template variables, like name, data, etc
+        var message = new Message{
+          Subject = email.Subject,
+          Source = "broadcast",
+          Slug = broadcast.Slug,
+          SendTo = contact.Email,
+          SendFrom = broadcast.ReplyTo,
+          Status = "queued",
+          SendAt = DateTimeOffset.UtcNow + TimeSpan.FromHours(email.DelayHours),
+          Html = email.Html,
+        };
+        _messages.Add(message);
+      }
+      return _messages;
+    }
+
 }
