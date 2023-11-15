@@ -11,7 +11,7 @@ var app = builder.Build();
 app.UseStaticFiles();
 app.MapFallbackToFile("index.html");
 
-var libPath = Path.Combine(app.Environment.WebRootPath, "Content");
+//var libPath = Path.Combine(app.Environment.WebRootPath, "Content");
 
 //lock this down as needed
 app.UseCors(builder => builder

@@ -8,8 +8,9 @@ public static class DotEnv
     public static void Load()
     {
         var execDirectory = Directory.GetCurrentDirectory();
-        string projectDirectory = Directory.GetParent(execDirectory).Parent.Parent.FullName;
-        var filePath = Path.Combine(projectDirectory, ".env");
+        // todo: remove
+        //string projectDirectory = Directory.GetParent(execDirectory).Parent.Parent.FullName;
+        var filePath = Path.Combine(execDirectory, ".env");
         if (!File.Exists(filePath)) return;
         //Console.WriteLine("Loading .env file");
         foreach (var line in File.ReadAllLines(filePath))
