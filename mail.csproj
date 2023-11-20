@@ -4,10 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <SpaRoot>../app/</SpaRoot>
-    <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
-    <SpaProxyServerUrl>http://localhost:4444</SpaProxyServerUrl>
-    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+    <DefaultItemExcludes>$(DefaultItemExcludes)</DefaultItemExcludes>
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
@@ -16,9 +13,10 @@
     <Compile Remove="Tests\*Tests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Watch Include="**\*.cs;**\*.js;**\*.json;**\*.html;**.*.md" Exclude="node_modules\**\*;wwwroot\**\*;" />
+    <Watch Include="**\*.cs;**\*.js;**\*.json;**\*.html;**.*.md"  />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' != 'Release'">
+    <PackageReference Include="Markdig" Version="0.33.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="7.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.11">
@@ -45,29 +43,4 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="7.0.0" />
-    <PackageReference Include="YamlDotNet" Version="13.0.0" />
-    <PackageReference Include="Markdig" Version="0.33.0" />
-  </ItemGroup>
-
-  <Target Name="PublishRunVite" AfterTargets="ComputeFilesToPublish">
-    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
-
-    <!-- Include the newly-built files in the publish output -->
-    <ItemGroup>
-      <DistFiles Include="$(SpaRoot)dist/**" />
-      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-        <RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </ResolvedFileToPublish>
-    </ItemGroup>
-    
-  </Target>
-
 </Project>
