@@ -1,4 +1,5 @@
-DotEnv.Load();
+//load up the config from env and appsettings
+Viper.Config();
 
 var builder = WebApplication.CreateBuilder(args);
  

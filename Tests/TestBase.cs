@@ -1,9 +1,12 @@
 public abstract class TestBase : IDisposable
 {
+  
     protected TestBase()
     {
-      Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
-      DotEnv.Load();
+      //load up the test config
+      Viper.Test();
+      // Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+      // DotEnv.Load();
     }
 
     public void Dispose()

@@ -44,10 +44,10 @@ public class Db: DbContext
     // .AddJsonFile("appsettings.json")
     // .Build();
     // var connectionString = config.GetConnectionString("MailApp");
-    DotEnv.Load();
-    
-    var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-
+    //DotEnv.Load();
+    var config = Viper.Config();
+    var connectionString = config.Get("DATABASE_URL");//Environment.GetEnvironmentVariable("DATABASE_URL");
+    Console.WriteLine(connectionString);
     optionsBuilder.UseNpgsql(connectionString);//.LogTo(Console.WriteLine, LogLevel.Information);
   }
 }
