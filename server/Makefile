@@ -3,7 +3,7 @@ APP_SERVICE="./Deployment/Azure/app_service.sh"
 TEST_DB="Host=localhost;Database=tailwind;Username=rob;"
 
 
-test:
+test: 
 	dotnet test
 
 db:
