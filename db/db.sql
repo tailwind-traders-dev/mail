@@ -44,20 +44,6 @@ create table subscriptions(
   primary key (contact_id, sequence_id)
 );
 
-
--- this one is extra tricky as segments are *dynamic*, which means
--- the filter condition for a segment needs to be executed every time
-create table segments(
-  id serial primary key,
-  name text not null,
-  -- this is the best way I can think of to deal with this
-  -- also the most flexible. We build the where
-  expression text not null default '1=1', --everyone... silly... i know
-  created_at timestamptz not null default now()
-);
-
-
-
 -- templates, which can belong to 0/n sequences. Transactionals don't have a sequence, but broadcasts
 -- are single-sequence emails as they need to have a title and description for tracking purposes
 create table emails(
@@ -78,7 +64,6 @@ create table broadcasts(
   email_id int not null references emails(id),
   slug text not null unique,
   status text not null default 'pending',
-  message_count int not null default 0,
   name text not null,
   reply_to text not null default 'noreply@tailwindtraders.dev',
   created_at timestamptz not null default now(),
