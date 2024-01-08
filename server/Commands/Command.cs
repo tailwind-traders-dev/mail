@@ -52,7 +52,6 @@ public class Command{
   {
     using var connection = new NpgsqlConnection(_connectionString);
     await connection.OpenAsync();
-    //var transaction = await connection.BeginTransactionAsync();
     var results = 0;
 
     //create a batch command
@@ -68,6 +67,7 @@ public class Command{
         }
         results += 1;
       }
+      await batch.ExecuteNonQueryAsync();
     }
 
     return results;

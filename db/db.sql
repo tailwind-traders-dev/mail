@@ -87,6 +87,8 @@ create table messages(
   created_at timestamptz not null default now()
 );
 
+--seeds for testing
+
 -- this function will queue a segment with the passed in HTML body
 -- not too certain how this will work but... let's see
 
