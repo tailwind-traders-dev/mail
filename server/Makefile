@@ -2,8 +2,12 @@ DEPLOY="./Deployment/azure/zip.sh"
 APP_SERVICE="./Deployment/Azure/app_service.sh"
 TEST_DB="Host=localhost;Database=tailwind;Username=rob;"
 
+
 test:
 	dotnet test
+
+db:
+	psql tailwind < ../db/db.sql
 
 zip:
 	source $(DEPLOY)

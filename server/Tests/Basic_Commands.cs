@@ -1,5 +1,4 @@
 using Xunit;
-using Tailwind.Mail.Services;
 using Tailwind.Mail.Commands;
 namespace Tailwind.Mail.Tests;
 

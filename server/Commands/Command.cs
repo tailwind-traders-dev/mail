@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Npgsql;
 
 namespace Tailwind.Mail.Commands;
@@ -53,23 +54,24 @@ public class Command{
     using var connection = new NpgsqlConnection(_connectionString);
     await connection.OpenAsync();
     var results = 0;
-
-    //create a batch command
-    await using(var batch = new NpgsqlBatch(connection))
-    {
+    using var transaction = connection.BeginTransaction();
+    try{
       foreach(var query in _queue)
       {
-        var cmd = new NpgsqlBatchCommand(query.Key);
+        using var command = new NpgsqlCommand(query.Key, connection, transaction);
         foreach(var parameter in query.Value)
         {
           Console.WriteLine($"{parameter.Key} = {parameter.Value}");
-          cmd.Parameters.AddWithValue(parameter.Key, parameter.Value);
+          command.Parameters.AddWithValue(parameter.Key, parameter.Value);
         }
-        results += 1;
+         await command.ExecuteNonQueryAsync();
+        results+=1; //just record the number of commands run
       }
-      await batch.ExecuteNonQueryAsync();
+      transaction.Commit();
+    }catch(NpgsqlException ex){
+      transaction.Rollback();
+      throw ex; //rethrow here
     }
-
     return results;
   }
 
