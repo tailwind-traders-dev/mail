@@ -48,16 +48,14 @@ public class Query
     return qry;
   }
 
-  public static Query Insert(string table, params object[] args)
+  public static Query Insert(string table, Dictionary<string, object> values)
   {
     //thank you copilot
-    var values = args.ToDictionary();
-    var sql = $"insert into {table} values ({string.Join(", ", values.Select(v => $"@{v}"))}) returning id;";
+    var sql = $"insert into {table} ({string.Join(", ", values.Keys)}) values ({string.Join(", ", values.Keys.Select(k => $"@{k}"))}) returning id;";
 
-    var qry = new Query { sql = sql, parameters=values };
+    var qry = new Query { sql = sql, parameters = values };
     return qry;
   }
-
 
   public static Query Update(string table, Dictionary<string, object> values)
   {
@@ -138,7 +136,7 @@ public class Query
     if(tx !=null){
       cmd.Transaction = tx;
     }
-    Console.WriteLine(cmd.CommandText);
+    //Console.WriteLine(cmd.CommandText);
     if(cmd.CommandText.Contains("select") || cmd.CommandText.Contains("with")){
       using(var rdr = await cmd.ExecuteReaderAsync()){
         var results = rdr.ToExpandoList();

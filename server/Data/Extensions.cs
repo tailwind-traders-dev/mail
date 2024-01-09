@@ -102,8 +102,8 @@ public static class CommandExtensions
   /// <summary>
   /// Turns the object into a Dictionary
   /// </summary>
-  public static Dictionary<string, object> ToDictionary(this object thingy)
+  public static IDictionary<string, object> ToDictionary(this object thingy)
   {
-    return (Dictionary<string, object>)thingy.ToExpando();
+    return (IDictionary<string, object>)thingy.ToExpando();
   }
 }
