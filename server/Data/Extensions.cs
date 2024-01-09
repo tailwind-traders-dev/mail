@@ -16,6 +16,7 @@ public static class CommandExtensions
       AddParam(cmd, item);
     }
   }
+
   /// <summary>
   /// Extension for adding single parameter
   /// </summary>
@@ -101,8 +102,8 @@ public static class CommandExtensions
   /// <summary>
   /// Turns the object into a Dictionary
   /// </summary>
-  public static IDictionary<string, object> ToDictionary(this object thingy)
+  public static Dictionary<string, object> ToDictionary(this object thingy)
   {
-    return (IDictionary<string, object>)thingy.ToExpando();
+    return (Dictionary<string, object>)thingy.ToExpando();
   }
 }

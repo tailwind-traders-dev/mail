@@ -48,14 +48,16 @@ public class Query
     return qry;
   }
 
-  public static Query Insert(string table, Dictionary<string, object> values)
+  public static Query Insert(string table, params object[] args)
   {
     //thank you copilot
-    var sql = $"insert into {table} ({string.Join(", ", values.Keys)}) values ({string.Join(", ", values.Keys.Select(k => $"@{k}"))}) returning id;";
+    var values = args.ToDictionary();
+    var sql = $"insert into {table} values ({string.Join(", ", values.Select(v => $"@{v}"))}) returning id;";
 
-    var qry = new Query { sql = sql, parameters = values };
+    var qry = new Query { sql = sql, parameters=values };
     return qry;
   }
+
 
   public static Query Update(string table, Dictionary<string, object> values)
   {

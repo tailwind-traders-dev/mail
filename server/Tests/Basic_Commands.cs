@@ -23,7 +23,7 @@ class CreateContactCommand: Command{
       {"name", "Test User"},
       {"email", "test@test.com"}
     };
-    var newContactId = await Query.Insert("mail.contacts", vals).Run(this.Connection, this.Transaction);
+    var newContactId = await Query.Insert("mail.contacts", new{name="Test User", email ="test@test.com"}).Run(this.Connection, this.Transaction);
     var changedContact = await Query.Update("mail.contacts", new Dictionary<string,object>{
       {"name", "Big Time"},
     }).Where(new Dictionary<string,object>{
