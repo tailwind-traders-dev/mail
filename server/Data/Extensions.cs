@@ -6,16 +6,53 @@ namespace Tailwind.Data;
 
 public static class CommandExtensions
 {
+
+  public static NpgsqlCommand AddParams(this NpgsqlCommand cmd, object o){
+    var expando = o.ToExpando();
+    var values = (IDictionary<string, object>)expando;
+    if (values != null)
+    {
+      foreach (var item in values)
+      {
+        cmd.Parameters.AddWithValue(item.Key, item.Value);
+      }
+    }
+    return cmd;
+  }
+
+
+  public static NpgsqlCommand Where(this NpgsqlCommand cmd, object o)
+  {
+    var expando = o.ToExpando();
+    var parameters = (IDictionary<string, object>)expando;
+    cmd.CommandText += $" where {string.Join(" and ", parameters.Keys.Select(k => $"{k}=@{k}"))}";
+    cmd.AddParams(o);
+    return cmd;
+  }
+  public static NpgsqlCommand Limit(this NpgsqlCommand cmd, int limit)
+  {
+    cmd.CommandText += $" limit {limit}";
+    return cmd;
+  }
+
+  public static NpgsqlCommand Order(this NpgsqlCommand cmd, string column = "id", string direction = "asc")
+  {
+    cmd.CommandText += $" order by {column} {direction}";
+    return cmd;
+  }
+
+
   /// <summary>
   /// Extension method for adding in a bunch of parameters
   /// </summary>
-  public static void AddParams(this NpgsqlCommand cmd, params object[] args)
-  {
-    foreach (var item in args)
-    {
-      AddParam(cmd, item);
-    }
-  }
+  // public static void AddParams(this NpgsqlCommand cmd, IDictionary<string, object> parameters)
+  // {
+  //   foreach (var item in parameters)
+  //   {
+  //     Console.WriteLine($"{item.Key} = {item.Value}");
+  //     cmd.Parameters.AddWithValue(item.Key, item.Value);
+  //   }
+  // }
 
   /// <summary>
   /// Extension for adding single parameter

@@ -3,7 +3,7 @@ using Tailwind.Data;
 
 namespace Tailwind.Mail.Tests;
 
-class CreateContactCommand: Command{
+class CreateContactCommand: ICommand {
   public string Name { get; set; }
   public string Email { get; set; }
   public CreateContactCommand(string name, string email)
@@ -13,31 +13,31 @@ class CreateContactCommand: Command{
   }
   public async Task<dynamic> Execute()
   {
-    //creating a transaction for the command bits
-    Begin();
-    await Query.Delete("mail.contacts").Where(new Dictionary<string,object>{
-      {"email", Email}
-    }).Run(this.Connection, this.Transaction);
 
-    var vals = new Dictionary<string,object>{
-      {"name", "Test User"},
-      {"email", "test@test.com"}
+    //Any issue with the database will roll the transaction back
+    //However, if there is programmatic error, you MUST call Rollback() manually
+    using(var db = new Transaction()){
+      //Commit is implicit if no exceptions are thrown
+
+      //delete existing contact
+      var deleted = db.Delete("mail.contacts", new {email="test@test.com"});
+      //create a new one
+      var newContactId = db.Insert("mail.contacts", new{name="Test User", email="test@test.com"});
+      //update existing
+      var updated = db.Update("mail.contacts", new {name="Big Time"}, new {id=newContactId});
+      
+      //throw new Exception("test");
+      //pull the new contact back out
+      var newContact = db.First("mail.contacts", new {id=newContactId});
+      
+      return new{
+        newContact,
+        deleted,
+        newContactId,
+        updated
+      };
+  
     };
-    var newContactId = await Query.Insert("mail.contacts", vals).Run(this.Connection, this.Transaction);
-    var changedContact = await Query.Update("mail.contacts", new Dictionary<string,object>{
-      {"name", "Big Time"},
-    }).Where(new Dictionary<string,object>{
-      {"id", newContactId}
-    }).Run(this.Connection, this.Transaction);
-
-    Commit();
-
-    //can't do this in the transaction because it's a different connection
-    var newContact = await Query.Select("mail.contacts").Where(new Dictionary<string,object>{
-      {"id", newContactId}
-    }).First();
-
-    return newContact;
     
   }
 }
@@ -48,33 +48,9 @@ public class Basic_Commands:TestBase
   public async Task A_contact_is_deleted_created_and_updated()
   {
 
-    var contact = await new CreateContactCommand("Test User", "test@test.com").Execute();
-    Assert.Equal("Big Time", contact.name);
-    Assert.Equal("test@test.com", contact.email);
+    var results = await new CreateContactCommand("Test User", "test@test.com").Execute();
+    Assert.Equal("Big Time", results.newContact.name);
+    Assert.Equal("test@test.com", results.newContact.email);
+    Assert.Equal(1, results.updated);
   }
 }
-
-// using Xunit;
-// using Tailwind.Mail.Commands;
-// namespace Tailwind.Mail.Tests;
-
-// public class Basic_Commands:TestBase
-// {
-//   [Fact]
-//   public async Task A_contact_is_deleted_created_and_updated()
-//   {
-//     var cmd = new Command();
-//     var vals =     new Dictionary<string,object>{
-//       {"name", "Test User"},
-//       {"email", "test@test.com "}
-//     };
-//     cmd.Delete("mail.contacts", vals);
-//     cmd.Insert("mail.contacts", vals);
-//     cmd.Update("mail.contacts", 1, new Dictionary<string,object>{
-//       {"name", "Test User 2"},
-//       {"email", "test2@test.com "}
-//     });
-//     var results = await cmd.Execute();
-//     Assert.Equal(3, results);
-//   }
-// }
