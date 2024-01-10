@@ -1,22 +1,26 @@
 // a class that wraps the idea of a query
 using System.Dynamic;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
-using SQLitePCL;
 
 
 namespace Tailwind.Data;
 
+public class TransactionResult{
+  public dynamic Data { get; set; }
+  public int Inserted { get; set; } = 0;
+  public int Updated { get; set; } = 0;
+  public int Deleted { get; set; } = 0;
+}
+
 public interface ICommand{
-  Task<dynamic> Execute();
+  Task<TransactionResult> Execute();
 }
 
 public class Transaction : Query, IDisposable
 {
 
   bool _shouldCommit { get; set; } = true;
-
   public Transaction()
   {
     _tx = _conn.BeginTransaction();
