@@ -12,61 +12,23 @@ public interface ICommand{
   Task<dynamic> Execute();
 }
 
-public class Transaction : IDisposable
+public class Transaction : Query, IDisposable
 {
-  NpgsqlConnection _conn { get; set; }
-  NpgsqlTransaction _tx { get; set; }
+
   bool _shouldCommit { get; set; } = true;
+
   public Transaction()
   {
-    string _connectionString = Viper.Config().Get("DATABASE_URL");
-    if(String.IsNullOrEmpty(_connectionString)){
-      throw new InvalidOperationException("You must set a DATABASE_URL environment variable or call Viper.Config()");
-    }
-    _conn = new NpgsqlConnection(_connectionString);
-    _conn.Open();
     _tx = _conn.BeginTransaction();
   }
+
   public void Commit(){
     _tx.Commit();
   }
   public void Rollback(){
     _tx.Rollback();
   }
-  public dynamic Raw(string sql, object o)
-  {
-    var cmd = new NpgsqlCommand(sql).AddParams(o);
-    return Run(cmd);
-  }
-  public dynamic Raw(string sql)
-  {
-    var cmd = new NpgsqlCommand(sql);
-    return Run(cmd);
-  }
-  public IList<dynamic> Select(string table)
-  {
-    var sql = $"select * from {table} limit 1000";
-    var cmd = new NpgsqlCommand(sql);
-    return Run(cmd);
-  }
-  public IList<dynamic> Select(string table, object where)
-  {
-    var sql = $"select * from {table}";
-    var cmd = new NpgsqlCommand(sql).Where(where).Limit(1000);
-    return Run(cmd);
-  }
-  public dynamic First(string table, object where)
-  {
-    var sql = $"select * from {table}";
-    var cmd = new NpgsqlCommand(sql).Where(where);
-    IList<dynamic> results = Run(cmd);
-    if(results == null){
-      return null;
-    }else{
-      return results[0];
-    }
-  }
-
+  
   public int Insert(string table, object o)
   {
     var expando = o.ToExpando();
@@ -106,12 +68,6 @@ public class Transaction : IDisposable
     cmd.Transaction = _tx;
     Console.WriteLine(cmd.CommandText);
     try{
-      if(cmd.CommandText.Contains("select") || cmd.CommandText.Contains("with")){
-        using(var rdr = cmd.ExecuteReader()){
-          var results = rdr.ToExpandoList();
-          return results;
-        }
-      }
       if(cmd.CommandText.Contains("returning")){
         var result = cmd.ExecuteScalar();
         if(result is null){
