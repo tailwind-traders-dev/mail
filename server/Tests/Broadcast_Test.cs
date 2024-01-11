@@ -106,7 +106,7 @@ public class Broadcast_Test:TestBase
   [Fact]
   public async Task A_broadcast_wont_send_to_unsubbed()
   {
-    var q = new Query().First("mail.emails", new{
+    var emailId = new Query().First("mail.emails", new{
       slug = "test-email"
     }).id;
 
