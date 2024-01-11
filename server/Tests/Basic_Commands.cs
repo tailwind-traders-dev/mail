@@ -22,7 +22,7 @@ class CreateContactCommand: ICommand {
       
       //create a new one
       var newContactId = db.Insert("mail.contacts", new{name="Test User", email="test@test.com"});
-      
+     
       //update existing
       result.Updated = db.Update("mail.contacts", new {name="Big Time"}, new {id=newContactId});
 

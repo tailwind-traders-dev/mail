@@ -22,7 +22,6 @@ public interface ICommand{
 public class Transaction : Query, IDisposable
 {
 
-  bool _shouldCommit { get; set; } = true;
   public Transaction()
   {
     _tx = _conn.BeginTransaction();
@@ -69,29 +68,25 @@ public class Transaction : Query, IDisposable
     cmd.Connection = _conn;
     cmd.Transaction = _tx;
     Console.WriteLine(cmd.CommandText);
-    try{
-      if(cmd.CommandText.Contains("returning")){
-        var result = cmd.ExecuteScalar();
-        if(result is null){
-          return 0; //TODO: this is a hack
-        }else{
-          return result;
-        }
+
+    if(cmd.CommandText.Contains("returning")){
+      var result = cmd.ExecuteScalar();
+      if(result is null){
+        return 0; //TODO: this is a hack
       }else{
-        var recordsAffected = cmd.ExecuteNonQuery();
-        return recordsAffected;
+        return result;
       }
-    }catch(Exception ex){
-      _tx.Rollback();
-      _shouldCommit = false;
-      throw ex;
+    }else{
+      var recordsAffected = cmd.ExecuteNonQuery();
+      return recordsAffected;
     }
+
 
   }
   public void Dispose()
   {
     //thanks Oren! https://ayende.com/blog/2577/did-you-know-find-out-if-an-exception-was-thrown-from-a-finally-block
-    if (Marshal.GetExceptionCode()==0 && _shouldCommit){
+    if (Marshal.GetExceptionPointers() == IntPtr.Zero){
       _tx.Commit();
     }else{
       Console.WriteLine("Rolling back transaction");
