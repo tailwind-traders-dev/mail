@@ -7,9 +7,9 @@ public class CreateBroadcast
 {
   public string Slug { get; set; }
   public int EmailId { get; set; }
-  public int? TagId { get; set; }
+  public int TagId { get; set; }
 
-  public CreateBroadcast(string slug, int emailId, int? sendToTagId)
+  public CreateBroadcast(string slug, int emailId, int sendToTagId=0)
   {
     Slug = slug;
     EmailId = emailId;
@@ -47,7 +47,7 @@ public class CreateBroadcast
       
       int messagesCreated;
 
-      if(TagId != null){
+      if(TagId != 0){
         sql += "and tags.id = @tagId";
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
@@ -66,7 +66,7 @@ public class CreateBroadcast
           html = email.html
         });
       }
-
+Console.WriteLine($"Created {messagesCreated} messages");
       cmd.Notify("broadcasts", Slug);
 
       return new CommandResult{

@@ -75,15 +75,52 @@ public class BroadCastTestCommand{
 public class Broadcast_Test:TestBase
 {
   [Fact]
-  public async Task A_broadcast_is_created_and_updated()
+  public async Task A_broadcast_is_created_and_sent_to_a_tag()
   {
 
     var testData = await new BroadCastTestCommand("## Test Derper", "Test Broadcast", "Test").Execute();
     var result = await new CreateBroadcast("test-broadcast", testData.Data.EmailId, testData.Data.TagId).Execute();
     
-    Console.WriteLine(result.Data);
+
     Assert.Equal(100, result.Inserted);
     Assert.Equal(true, result.Data.Notified);
+
+  }
+  [Fact]
+  public async Task A_broadcast_is_created_and_sent_to_every_sub()
+  {
+    var q = new Query();
+
+    var emailId = q.First("mail.emails", new{
+      slug = "test-email"
+    }).id;
+
+    //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
+    var result = await new CreateBroadcast("test-broadcast-2", emailId).Execute();
+    
+    Assert.Equal(100, result.Inserted);
+
+  }
+  [Fact]
+  public async Task A_broadcast_wont_send_to_unsubbed()
+  {
+    var q = new Query();
+
+    var emailId = q.First("mail.emails", new{
+      slug = "test-email"
+    }).id;
+
+    using(var cmd = new Command()){
+      cmd.Insert("mail.contacts", new {
+        name = "Unsubbed User",
+        email = "dontbotherme@test.com",
+        subscribed = false
+      });
+    }
+    //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
+    var result = await new CreateBroadcast("test-broadcast-3", emailId).Execute();
+    
+    Assert.Equal(100, result.Inserted);
 
   }
 }
