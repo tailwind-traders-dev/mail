@@ -13,12 +13,11 @@ public class BroadCastTestCommand{
   public string Slug { get; set; }
   public string Subject { get; set; }
 
-  public BroadCastTestCommand(string markdown, string subject, string send_to_tag)
+  public BroadCastTestCommand(string markdown, string subject)
   {
     var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
     this.Markdown = markdown;
     this.Html = Markdig.Markdown.ToHtml(markdown, pipeline);
-    this.SendToTag = send_to_tag;
     this.Subject = subject;
   }
   public async Task<CommandResult> Execute(){
@@ -28,29 +27,30 @@ public class BroadCastTestCommand{
       
       //running this just in case but you *should* be running this using
       //make because it will drop/reload the db for you :)
-      cmd.Raw("delete from mail.tagged");
-      cmd.Raw("delete from mail.tags");
-      cmd.Raw("delete from mail.contacts");
-      cmd.Raw("delete from mail.broadcasts");
-      cmd.Raw("delete from mail.emails");
+      // cmd.Raw("delete from mail.tagged");
+      // cmd.Raw("delete from mail.tags");
+      // cmd.Raw("delete from mail.contacts");
+      // cmd.Raw("delete from mail.broadcasts");
+      // cmd.Raw("delete from mail.emails");
 
-      var tagId = cmd.Insert("mail.tags", new{
-        slug = SendToTag.ToLower(),
-        name = SendToTag
-      });
+      // var tagId = cmd.Insert("mail.tags", new{
+      //   slug = SendToTag.ToLower(),
+      //   name = SendToTag
+      // });
 
+      //this is now handled in the seed.sql file
       //create 100 contacts
-      for(var i = 0; i < 100; i++){
-        var cid = cmd.Insert("mail.contacts", new{
-          name = $"Test User {i}",
-          email = $"test{i}@test.com"
-        });
-        //tag them
-        cmd.Raw("insert into mail.tagged(contact_id, tag_id) values (@contact_id, @tag_id)", new{
-          contact_id = cid,
-          tag_id = tagId
-        });
-      }
+      // for(var i = 0; i < 10000; i++){
+      //   var cid = cmd.Insert("mail.contacts", new{
+      //     name = $"Test User {i}",
+      //     email = $"test{i}@test.com"
+      //   });
+      //   //tag them
+      //   cmd.Raw("insert into mail.tagged(contact_id, tag_id) values (@contact_id, @tag_id)", new{
+      //     contact_id = cid,
+      //     tag_id = tagId
+      //   });
+      // }
 
 
       //create the email
@@ -65,7 +65,6 @@ public class BroadCastTestCommand{
       return new CommandResult{
         Data = new{
           EmailId = emailId,
-          TagId = tagId,
           ContactsCreated = 100,
           TablesEmpty = true
         }
@@ -80,11 +79,12 @@ public class Broadcast_Test:TestBase
   public async Task A_broadcast_is_created_and_sent_to_a_tag()
   {
 
-    var testData = await new BroadCastTestCommand("## Test Derper", "Test Broadcast", "Test").Execute();
-    var result = await new CreateBroadcast("test-broadcast", testData.Data.EmailId, testData.Data.TagId).Execute();
+    var testData = await new BroadCastTestCommand("## Test Derper", "Test Broadcast").Execute();
+    //this tag id will exist if you run the seed.sql file which is what you should be doing
+    //the makefile does it for you just run make
+    var result = await new CreateBroadcast("test-broadcast", testData.Data.EmailId, 1).Execute();
     
-
-    Assert.Equal(100, result.Inserted);
+    Assert.Equal(10000, result.Inserted);
     Assert.Equal(true, result.Data.Notified);
 
   }
@@ -100,7 +100,7 @@ public class Broadcast_Test:TestBase
     //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
     var result = await new CreateBroadcast("test-broadcast-2", emailId).Execute();
     
-    Assert.Equal(100, result.Inserted);
+    Assert.Equal(10000, result.Inserted);
 
   }
   [Fact]
@@ -112,15 +112,16 @@ public class Broadcast_Test:TestBase
 
     using(var cmd = new Command()){
       cmd.Insert("mail.contacts", new {
+        //id = 100001,
         name = "Unsubbed User",
-        email = "dontbotherme@test.com",
+        email = "leavemealone@test.com",
         subscribed = false
       });
     }
     //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
-    var result = await new CreateBroadcast("test-broadcast-3", emailId).Execute();
+    //var result = await new CreateBroadcast("test-broadcast-3", emailId).Execute();
     
-    Assert.Equal(100, result.Inserted);
+    //Assert.Equal(10000, result.Inserted);
 
   }
 }

@@ -65,6 +65,7 @@ public static class CommandExtensions
     {
       foreach (var item in values)
       {
+        //Console.WriteLine($"{item.Key} = {item.Value}");
         cmd.Parameters.AddWithValue(item.Key, item.Value);
       }
     }

@@ -40,6 +40,7 @@ public class Command : Query, IDisposable
     var values = o.ToValueList();
     var cols = o.ToColumnList();
     var sql = $"insert into {table} ({cols}) values ({values}) returning id;";
+    //Console.WriteLine(sql);
     var cmd = new NpgsqlCommand(sql).AddParams(o);
     return Run(cmd);
   }

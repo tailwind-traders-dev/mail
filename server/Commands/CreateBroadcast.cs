@@ -44,28 +44,33 @@ public class CreateBroadcast
           insert into mail.messages (source, slug, send_to, send_from, subject, html, send_at)
           select 'broadcast', @slug, mail.contacts.email, @reply_to, @subject, @html, now() 
           from mail.contacts
-          inner join mail.tagged on mail.tagged.contact_id = mail.contacts.id
-          inner join mail.tags on mail.tags.id = mail.tagged.tag_id
-          where subscribed = true
         ";
       
       int messagesCreated;
-
+      var from = Viper.Config().Get("DEFAULT_FROM");
+      if(String.IsNullOrEmpty(from)){
+        from="noreply@tailwind.dev";
+      }
       if(TagId != 0){
-        sql += "and tags.id = @tagId";
+        sql += @"
+        inner join mail.tagged on mail.tagged.contact_id = mail.contacts.id
+        inner join mail.tags on mail.tags.id = mail.tagged.tag_id
+        where subscribed = true
+        and tags.id = @tagId";
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
           TagId,
           slug = Slug,
-          reply_to = Viper.Config().Get("DEFAULT_FROM"),
+          reply_to = from,
           subject = email.subject,
           html = email.html
         });
       }else{
+        sql+=" where subscribed = true";
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
           slug = Slug,
-          reply_to = Viper.Config().Get("DEFAULT_FROM"),
+          reply_to = from,
           subject = email.subject,
           html = email.html
         });
