@@ -35,7 +35,11 @@ public class CreateBroadcast
         name = email.subject
       });
 
-      //create the messages
+      //create the messages - glorious sql, isn't it?
+      //makes me want to write a haiku using copilot, all about SQL:
+      //select from where and join
+      //insert update delete
+      //sql is the best
       var sql = @"
           insert into mail.messages (source, slug, send_to, send_from, subject, html, send_at)
           select 'broadcast', @slug, mail.contacts.email, @reply_to, @subject, @html, now() 
@@ -66,7 +70,7 @@ public class CreateBroadcast
           html = email.html
         });
       }
-Console.WriteLine($"Created {messagesCreated} messages");
+
       cmd.Notify("broadcasts", Slug);
 
       return new CommandResult{

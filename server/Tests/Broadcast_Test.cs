@@ -26,6 +26,8 @@ public class BroadCastTestCommand{
     
     using(var cmd = new Command()){
       
+      //running this just in case but you *should* be running this using
+      //make because it will drop/reload the db for you :)
       cmd.Raw("delete from mail.tagged");
       cmd.Raw("delete from mail.tags");
       cmd.Raw("delete from mail.contacts");
@@ -104,9 +106,7 @@ public class Broadcast_Test:TestBase
   [Fact]
   public async Task A_broadcast_wont_send_to_unsubbed()
   {
-    var q = new Query();
-
-    var emailId = q.First("mail.emails", new{
+    var q = new Query().First("mail.emails", new{
       slug = "test-email"
     }).id;
 
