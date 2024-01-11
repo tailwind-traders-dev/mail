@@ -1,5 +1,6 @@
 using Xunit;
 using Tailwind.Data;
+using Tailwind.Mail.Commands;
 using Markdig;
 
 namespace Tailwind.Mail.Tests;
@@ -12,13 +13,12 @@ public class BroadCastTestCommand{
   public string Slug { get; set; }
   public string Subject { get; set; }
 
-  public BroadCastTestCommand(string slug, string markdown, string subject, string send_to_tag)
+  public BroadCastTestCommand(string markdown, string subject, string send_to_tag)
   {
     var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
     this.Markdown = markdown;
     this.Html = Markdig.Markdown.ToHtml(markdown, pipeline);
     this.SendToTag = send_to_tag;
-    this.Slug = slug;
     this.Subject = subject;
   }
   public async Task<CommandResult> Execute(){
@@ -59,42 +59,13 @@ public class BroadCastTestCommand{
         html = this.Html
       });
 
-
-      var broacastId = cmd.Insert("mail.broadcasts", new{
-        email_id = emailId,
-        slug = "test-broadcast",
-        name = "Test Broadcast",
-      });
-
-      
-      //create the messages
-      var sql = @"
-        insert into mail.messages (source, slug, send_to, send_from, subject, html, send_at)
-        select 'broadcast', @slug, mail.contacts.email, @reply_to, @subject, @html, now() 
-        from mail.contacts
-        inner join mail.tagged on mail.tagged.contact_id = mail.contacts.id
-        inner join mail.tags on mail.tags.id = mail.tagged.tag_id
-        where subscribed = true
-        and tags.id = @tagId;
-      ";
-
-      cmd.Raw(sql, new{
-        broacastId,
-        tagId,
-        slug = Slug,
-        reply_to = Viper.Config().Get("DEFAULT_FROM"),
-        subject = Subject,
-        html = Html
-      });
-
-      //ping the job
-      cmd.Notify("broadcasts", Slug);
       
       return new CommandResult{
         Data = new{
-          BroadcastId = broacastId,
           EmailId = emailId,
-          ContactsCreated = 100
+          TagId = tagId,
+          ContactsCreated = 100,
+          TablesEmpty = true
         }
       };
     };
@@ -107,8 +78,12 @@ public class Broadcast_Test:TestBase
   public async Task A_broadcast_is_created_and_updated()
   {
 
-    var result = await new BroadCastTestCommand("test-broadcast", "## Test Email", "Test Broadcast", "Test").Execute();
-    Assert.Equal(100, result.Data.ContactsCreated);
+    var testData = await new BroadCastTestCommand("## Test Derper", "Test Broadcast", "Test").Execute();
+    var result = await new CreateBroadcast("test-broadcast", testData.Data.EmailId, testData.Data.TagId).Execute();
+    
+    Console.WriteLine(result.Data);
+    Assert.Equal(100, result.Inserted);
+    Assert.Equal(true, result.Data.Notified);
 
   }
 }

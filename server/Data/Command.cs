@@ -44,20 +44,9 @@ public class Command : Query, IDisposable
     return Run(cmd);
   }
 
-  public int InsertMany(string table, IEnumerable<object> list)
+  public int Exec(string sql, object o)
   {
-    var first = list.First();
-    var sb = new StringBuilder();
-    for(var i = 0; i < list.Count(); i++){
-      var vals = list.ElementAt(i).ToValueList();
-      sb.Append($"({vals})");
-    }
-    var cols = first.ToColumnList();
-    var sql = $"insert into {table} ({cols}) values ({sb.ToString()}) returning id;";
-    var cmd = new NpgsqlCommand(sql);
-    foreach(var o in list){
-      cmd.AddParams(o);
-    }
+    var cmd = new NpgsqlCommand(sql).AddParams(o);
     return Run(cmd);
   }
 
