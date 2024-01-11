@@ -2,13 +2,14 @@
 using System.Diagnostics.Contracts;
 using System.Dynamic;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 
 namespace Tailwind.Data;
 
-public class TransactionResult{
+public class CommandResult{
   public dynamic Data { get; set; }
   public int Inserted { get; set; } = 0;
   public int Updated { get; set; } = 0;
@@ -16,13 +17,13 @@ public class TransactionResult{
 }
 
 public interface ICommand{
-  Task<TransactionResult> Execute();
+  Task<CommandResult> Execute();
 }
 
-public class Transaction : Query, IDisposable
+public class Command : Query, IDisposable
 {
 
-  public Transaction()
+  public Command()
   {
     _tx = _conn.BeginTransaction();
   }
@@ -40,6 +41,23 @@ public class Transaction : Query, IDisposable
     var cols = o.ToColumnList();
     var sql = $"insert into {table} ({cols}) values ({values}) returning id;";
     var cmd = new NpgsqlCommand(sql).AddParams(o);
+    return Run(cmd);
+  }
+
+  public int InsertMany(string table, IEnumerable<object> list)
+  {
+    var first = list.First();
+    var sb = new StringBuilder();
+    for(var i = 0; i < list.Count(); i++){
+      var vals = list.ElementAt(i).ToValueList();
+      sb.Append($"({vals})");
+    }
+    var cols = first.ToColumnList();
+    var sql = $"insert into {table} ({cols}) values ({sb.ToString()}) returning id;";
+    var cmd = new NpgsqlCommand(sql);
+    foreach(var o in list){
+      cmd.AddParams(o);
+    }
     return Run(cmd);
   }
 

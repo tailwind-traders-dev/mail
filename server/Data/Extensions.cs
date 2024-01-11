@@ -23,26 +23,26 @@ public static class ObjectExtensions{
     var values = (IDictionary<string, object>)expando;
     return string.Join(", ", values.Keys);
   }
- public static dynamic ToExpando(this object o)
-  {
-    if (o.GetType() == typeof(ExpandoObject)) return o; //shouldn't have to... but just in case
-    var result = new ExpandoObject();
-    var d = result as IDictionary<string, object>; //work with the Expando as a Dictionary
-    if (o.GetType() == typeof(NameValueCollection) || o.GetType().IsSubclassOf(typeof(NameValueCollection)))
+  public static dynamic ToExpando(this object o)
     {
-      var nv = (NameValueCollection)o;
-      nv.Cast<string>().Select(key => new KeyValuePair<string, object>(key, nv[key])).ToList().ForEach(i => d.Add(i));
-    }
-    else
-    {
-      var props = o.GetType().GetProperties();
-      foreach (var item in props)
+      if (o.GetType() == typeof(ExpandoObject)) return o; //shouldn't have to... but just in case
+      var result = new ExpandoObject();
+      var d = result as IDictionary<string, object>; //work with the Expando as a Dictionary
+      if (o.GetType() == typeof(NameValueCollection) || o.GetType().IsSubclassOf(typeof(NameValueCollection)))
       {
-        d.Add(item.Name, item.GetValue(o, null));
+        var nv = (NameValueCollection)o;
+        nv.Cast<string>().Select(key => new KeyValuePair<string, object>(key, nv[key])).ToList().ForEach(i => d.Add(i));
       }
+      else
+      {
+        var props = o.GetType().GetProperties();
+        foreach (var item in props)
+        {
+          d.Add(item.Name, item.GetValue(o, null));
+        }
+      }
+      return result;
     }
-    return result;
-  }
 
   /// <summary>
   /// Turns the object into a Dictionary

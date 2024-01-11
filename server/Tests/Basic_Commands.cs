@@ -11,17 +11,17 @@ class CreateContactCommand: ICommand {
     Name = name;
     Email = email;
   }
-  public async Task<TransactionResult> Execute()
+  public async Task<CommandResult> Execute()
   {
     //Commit is implicit if no db exceptions are thrown.
-    var result = new TransactionResult();
-    using(var db = new Transaction()){
+    var result = new CommandResult();
+    using(var db = new Command()){
       
       //delete existing contact
-      result.Deleted = db.Delete("mail.contacts", new {email="test@test.com"});
+      result.Deleted = db.Delete("mail.contacts", new {email=Email});
       
       //create a new one
-      var newContactId = db.Insert("mail.contacts", new{name="Test User", email="test@test.com"});
+      var newContactId = db.Insert("mail.contacts", new{name=Name, email=Email});
      
       //update existing
       result.Updated = db.Update("mail.contacts", new {name="Big Time"}, new {id=newContactId});
