@@ -70,6 +70,13 @@ public class Command : Query, IDisposable
     return Run(cmd);
   }
 
+  public int Notify(string channel, string payload)
+  {
+    var sql = $"notify {channel}, '{payload}'";
+    var cmd = new NpgsqlCommand(sql);
+    return Run(cmd);
+  }
+
   public int Delete(string table, object where)
   {
     if(where == null){
@@ -85,7 +92,7 @@ public class Command : Query, IDisposable
   {
     cmd.Connection = _conn;
     cmd.Transaction = _tx;
-    Console.WriteLine(cmd.CommandText);
+    //Console.WriteLine(cmd.CommandText);
 
     if(cmd.CommandText.Contains("returning")){
       var result = cmd.ExecuteScalar();

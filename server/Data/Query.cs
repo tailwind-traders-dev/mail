@@ -51,7 +51,7 @@ public class Query {
     if(_tx != null){
       cmd.Transaction = _tx;
     }
-    Console.WriteLine(cmd.CommandText);
+    //Console.WriteLine(cmd.CommandText);
 
     using(var rdr = cmd.ExecuteReader()){
       var results = rdr.ToExpandoList();
