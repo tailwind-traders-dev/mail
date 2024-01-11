@@ -3,11 +3,11 @@ APP_SERVICE="./Deployment/Azure/app_service.sh"
 TEST_DB="Host=localhost;Database=tailwind;Username=rob;"
 
 
-test: 
+test: db
 	dotnet test
 
 db:
-	psql tailwind < ../db/db.sql
+	psql tailwind < ../db/db.sql --quiet
 
 zip:
 	source $(DEPLOY)
