@@ -7,6 +7,24 @@ namespace Tailwind.Data;
 public static class CommandExtensions
 {
 
+  public static string ToValueList(this object o)
+  {
+    var expando = o.ToExpando();
+    var values = (IDictionary<string, object>)expando;
+    return string.Join(", ", values.Keys.Select(k => $"@{k}"));
+  }
+  public static string ToSettingList(this object o)
+  {
+    var expando = o.ToExpando();
+    var values = (IDictionary<string, object>)expando;
+    return string.Join(", ", values.Keys.Select(k => $"{k}=@{k}"));
+  }
+  public static string ToColumnList(this object o)
+  {
+    var expando = o.ToExpando();
+    var values = (IDictionary<string, object>)expando;
+    return string.Join(", ", values.Keys);
+  }
   public static NpgsqlCommand AddParams(this NpgsqlCommand cmd, object o){
     var expando = o.ToExpando();
     var values = (IDictionary<string, object>)expando;

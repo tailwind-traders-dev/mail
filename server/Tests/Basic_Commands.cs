@@ -13,10 +13,7 @@ class CreateContactCommand: ICommand {
   }
   public async Task<TransactionResult> Execute()
   {
-
-    //Any issue with the database will roll the transaction back
-    //However, if there is programmatic error, you MUST call Rollback() manually
-    //Commit is implicit if no db exceptions are thrown
+    //Commit is implicit if no db exceptions are thrown.
     var result = new TransactionResult();
     using(var db = new Transaction()){
       
@@ -28,7 +25,7 @@ class CreateContactCommand: ICommand {
       
       //update existing
       result.Updated = db.Update("mail.contacts", new {name="Big Time"}, new {id=newContactId});
-      
+
       //pull the new contact back out
       result.Data = db.First("mail.contacts", new {id=newContactId});
       

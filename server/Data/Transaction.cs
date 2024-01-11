@@ -1,5 +1,7 @@
 // a class that wraps the idea of a query
+using System.Diagnostics.Contracts;
 using System.Dynamic;
+using System.Runtime.InteropServices;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
@@ -35,34 +37,30 @@ public class Transaction : Query, IDisposable
   
   public int Insert(string table, object o)
   {
-    var expando = o.ToExpando();
-    var values = (IDictionary<string, object>)expando;
-    var sql = $"insert into {table} ({string.Join(", ", values.Keys)}) values ({string.Join(", ", values.Keys.Select(k => $"@{k}"))}) returning id;";
+    var values = o.ToValueList();
+    var cols = o.ToColumnList();
+    var sql = $"insert into {table} ({cols}) values ({values}) returning id;";
     var cmd = new NpgsqlCommand(sql).AddParams(o);
     return Run(cmd);
   }
 
   public int Update(string table, object settings, object where)
   {
-     
-    var settingsExpando = settings.ToExpando();
-    var dSettings = (IDictionary<string, object>)settingsExpando;
-    var sql = $"update {table} set {string.Join(",", dSettings.Keys.Select(k => $"{k}=@{k}"))}";
-    var cmd = new NpgsqlCommand(sql).AddParams(settings);
-    cmd.Where(where);
+  
+    var sets = settings.ToSettingList();
+    var sql = $"update {table} set {sets}";
+    var cmd = new NpgsqlCommand(sql).AddParams(settings).Where(where);
     return Run(cmd);
   }
 
   public int Delete(string table, object where)
   {
-    var expando = where.ToExpando();
-    var dict = (IDictionary<string, object>)expando;
-    var sql = $"delete from {table}";
-    var cmd = new NpgsqlCommand(sql);
-    if(dict.IsNullOrEmpty()){
+    if(where == null){
       throw new InvalidOperationException("You must provide a where clause otherwise you'll delete everything. If that's what you want, run it Raw.");
     }
-    cmd.Where(dict);
+    var sql = $"delete from {table}";
+    var cmd = new NpgsqlCommand(sql);
+    cmd.Where(where);
     return Run(cmd);
   }
 
@@ -92,8 +90,12 @@ public class Transaction : Query, IDisposable
   }
   public void Dispose()
   {
-    if(_shouldCommit){
+    //thanks Oren! https://ayende.com/blog/2577/did-you-know-find-out-if-an-exception-was-thrown-from-a-finally-block
+    if (Marshal.GetExceptionCode()==0 && _shouldCommit){
       _tx.Commit();
+    }else{
+      Console.WriteLine("Rolling back transaction");
+      _tx.Rollback();
     }
     _conn.Close();
   }
