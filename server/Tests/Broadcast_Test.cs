@@ -25,34 +25,6 @@ public class BroadCastTestCommand{
     
     using(var cmd = new Command()){
       
-      //running this just in case but you *should* be running this using
-      //make because it will drop/reload the db for you :)
-      // cmd.Raw("delete from mail.tagged");
-      // cmd.Raw("delete from mail.tags");
-      // cmd.Raw("delete from mail.contacts");
-      // cmd.Raw("delete from mail.broadcasts");
-      // cmd.Raw("delete from mail.emails");
-
-      // var tagId = cmd.Insert("mail.tags", new{
-      //   slug = SendToTag.ToLower(),
-      //   name = SendToTag
-      // });
-
-      //this is now handled in the seed.sql file
-      //create 100 contacts
-      // for(var i = 0; i < 10000; i++){
-      //   var cid = cmd.Insert("mail.contacts", new{
-      //     name = $"Test User {i}",
-      //     email = $"test{i}@test.com"
-      //   });
-      //   //tag them
-      //   cmd.Raw("insert into mail.tagged(contact_id, tag_id) values (@contact_id, @tag_id)", new{
-      //     contact_id = cid,
-      //     tag_id = tagId
-      //   });
-      // }
-
-
       //create the email
       var emailId = cmd.Insert("mail.emails", new{
         slug = "test-email",
@@ -81,7 +53,8 @@ public class Broadcast_Test:TestBase
 
     var testData = await new BroadCastTestCommand("## Test Derper", "Test Broadcast").Execute();
     //this tag id will exist if you run the seed.sql file which is what you should be doing
-    //the makefile does it for you just run make
+    //the Makefile does it for you just run make
+    //That's right. I said Make.
     var result = await new CreateBroadcast("test-broadcast", testData.Data.EmailId, 1).Execute();
     
     Assert.Equal(10000, result.Inserted);
@@ -97,7 +70,6 @@ public class Broadcast_Test:TestBase
       slug = "test-email"
     }).id;
 
-    //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
     var result = await new CreateBroadcast("test-broadcast-2", emailId).Execute();
     
     Assert.Equal(10000, result.Inserted);
@@ -112,16 +84,15 @@ public class Broadcast_Test:TestBase
 
     using(var cmd = new Command()){
       cmd.Insert("mail.contacts", new {
-        //id = 100001,
         name = "Unsubbed User",
         email = "leavemealone@test.com",
         subscribed = false
       });
     }
     //var testData = await new BroadCastTestCommand("## Test Every Sub", "Test Broadcast 2", "Test").Execute();
-    //var result = await new CreateBroadcast("test-broadcast-3", emailId).Execute();
+    var result = await new CreateBroadcast("test-broadcast-3", emailId).Execute();
     
-    //Assert.Equal(10000, result.Inserted);
+    Assert.Equal(10000, result.Inserted);
 
   }
 }
