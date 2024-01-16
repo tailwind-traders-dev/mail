@@ -14,7 +14,9 @@ public class Joe_Signs_Up_Successfully{
     Assert.False(res.Data.Subscribed);
   }
   [Fact]
-  public void Joe_confirms_he_is_subbed()
+  //HACK: I hate writing tests this way but I need things done serially
+  //and Xunit won't do that
+  public void Joe_confirms_he_is_subbed_then_unsubs()
   {
     dynamic joe = new Query().First("mail.contacts", new{
       email = "joe@test.com"
@@ -28,6 +30,14 @@ public class Joe_Signs_Up_Successfully{
     });
     Assert.True(joe.subscribed);
 
+    res = new ContactOptOutCommand("joe@test.com").Execute();
+    Assert.Equal(1, res.Updated);
+    Assert.True(res.Data.Success); 
+
+    joe = new Query().First("mail.contacts", new{
+      email = "joe@test.com"
+    });
+    Assert.False(joe.subscribed);
   }
 }
 [Collection("Jack Signs Up But Is Already here")]
