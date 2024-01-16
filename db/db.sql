@@ -5,10 +5,19 @@ set search_path=mail;
 create table contacts(
   id serial primary key,
   email text not null unique,
+  key text not null default gen_random_uuid(),
   subscribed boolean not null default true,
   name text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
+);
+
+create table activity(
+  id serial primary key,
+  contact_id int not null references contacts(id),
+  key text not null,
+  description text not null,
+  created_at timestamptz not null default now()
 );
 
 create table tags(

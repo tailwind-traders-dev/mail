@@ -26,6 +26,22 @@ public class Query {
     var cmd = new NpgsqlCommand(sql);
     return Run(cmd);
   }
+
+  public long Count(string table)
+  {
+    var sql = $"select count(1) as count from {table}";
+    var cmd = new NpgsqlCommand(sql);
+    dynamic res =  Run(cmd);
+    return res != null ? res.count : 0;
+  }
+  public long Count(string table, object where)
+  {
+    var sql = $"select count(1) as count from {table}";
+    var cmd = new NpgsqlCommand(sql).Where(where);
+    dynamic res =  Run(cmd);
+    return res != null ? res.count : 0;
+  }
+
   public IList<dynamic> Select(string table)
   {
     var sql = $"select * from {table} limit 1000";

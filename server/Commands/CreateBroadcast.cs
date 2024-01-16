@@ -15,7 +15,7 @@ public class CreateBroadcast
     EmailId = emailId;
     TagId = sendToTagId;
   }
-  public async Task<CommandResult> Execute(){
+  public CommandResult Execute(){
 
     using(var cmd = new Command()){
 
@@ -66,7 +66,7 @@ public class CreateBroadcast
           html = email.html
         });
       }else{
-        sql+=" where subscribed = true";
+        sql+="where subscribed = true";
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
           slug = Slug,
@@ -75,7 +75,7 @@ public class CreateBroadcast
           html = email.html
         });
       }
-
+      
       cmd.Notify("broadcasts", Slug);
 
       return new CommandResult{
