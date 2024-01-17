@@ -144,14 +144,24 @@ public class Viper {
     var filePath = Path.Combine(execDirectory, name);
     if(File.Exists(filePath)) return filePath;
 
-    //project root
-    string projectDirectory = Directory.GetParent(execDirectory).Parent.Parent.FullName;
-    filePath = Path.Combine(projectDirectory, name);
-    if(File.Exists(filePath)) return filePath;
+    // TODO: restore project root and config directory
+    // but this is causing problems in the container
+    /*
+      Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.
+      at Viper.FindConfigFile(String name) in /app/Viper/Viper.cs:line 148
+      at Viper.Config(String env, IEnumerable`1 defaults) in /app/Viper/Viper.cs:line 114
+      at Viper.Config(String env) in /app/Viper/Viper.cs:line 96
+      at Viper.Config() in /app/Viper/Viper.cs:line 76
+      at Program.<Main>$(String[] args) in /app/Program.cs:line 2
+    */
+    // //project root
+    // string projectDirectory = Directory.GetParent(execDirectory).Parent.Parent.FullName;
+    // filePath = Path.Combine(projectDirectory, name);
+    // if(File.Exists(filePath)) return filePath;
 
-    //config directory
-    filePath = Path.Combine(projectDirectory, "config", name);
-    if(File.Exists(filePath)) return filePath;
+    // //config directory
+    // filePath = Path.Combine(projectDirectory, "config", name);
+    // if(File.Exists(filePath)) return filePath;
 
     return null;
   }
