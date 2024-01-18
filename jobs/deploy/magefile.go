@@ -4,11 +4,19 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
 type Deploy mg.Namespace
+
+// Test deployment to <name>
+func (Deploy) Test(name string) error {
+	fmt.Printf("Testing deployment to: %s\n", name)
+	return nil
+}
 
 // Empty empties the <resource group> via empty.bicep
 func (Deploy) Empty(resourceGroup string) error {
