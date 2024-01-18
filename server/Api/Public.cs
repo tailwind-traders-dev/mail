@@ -1,1 +1,1 @@
-//public endpoints for subscribe/unsub
+//public endpoints for subscribe/unsubscribe
