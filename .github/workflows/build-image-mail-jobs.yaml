@@ -3,6 +3,9 @@ name: Build and publish mail-jobs container image
 on:
   push:
     branches: ['latest']
+    paths:
+      - 'jobs/**'
+  workflow_dispatch:
 
 env:
   REGISTRY: ghcr.io
