@@ -1,36 +1,23 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Tailwind.Data;
+using Tailwind.Mail.Models;
 
 namespace Tailwind.Mail.Commands;
 
 public class ContactOptOutCommand{
-  public string? Email { get; set; }
-  public ContactOptOutCommand(string email)
+  public Contact Contact { get; set; }
+  public ContactOptOutCommand(Contact contact)
   {
-    Email = email;
+    Contact = contact;
   }
   public CommandResult Execute(){
     
     using(var cmd = new Command()){
       
-      var contact = new Query().First("mail.contacts", new{
-        email = Email
-      });
-
-      if(contact == null){
-        return new CommandResult{
-          Data = new{
-            Success = false,
-            Message = "Contact not found"
-          }
-        };
-      }
-
       cmd.Update("mail.contacts", new{subscribed = false}, new{
-        id = contact.id
+        id = Contact.ID
       });
       cmd.Insert("mail.activity", new{
-        contact_id = contact.id,
+        contact_id = Contact.ID,
         key = "optout",
         description="Unsubbed",
       });

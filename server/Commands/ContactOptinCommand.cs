@@ -1,36 +1,24 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Tailwind.Mail.Models;
 using Tailwind.Data;
 
 namespace Tailwind.Mail.Commands;
 
 public class ContactOptinCommand{
-  public string? Key { get; set; }
-  public ContactOptinCommand(string key)
+  public Contact Contact { get; set; }
+  public ContactOptinCommand(Contact contact)
   {
-    Key = key; 
+    Contact = contact;
   }
+
   public CommandResult Execute(){
     
     using(var cmd = new Command()){
-      
-      var contact = new Query().First("mail.contacts", new{
-        key = Key
-      });
-
-      if(contact == null){
-        return new CommandResult{
-          Data = new{
-            Success = false,
-            Message = "Contact not found"
-          }
-        };
-      }
-
+    
       cmd.Update("mail.contacts", new{subscribed = true}, new{
-        id = contact.id
+        id = Contact.ID
       });
       cmd.Insert("mail.activity", new{
-        contact_id = contact.id,
+        contact_id = Contact.ID,
         key = "optin",
         description="Opted in using key",
       });

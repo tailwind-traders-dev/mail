@@ -1,22 +1,21 @@
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Tailwind.Data;
+using Tailwind.Mail.Models;
 
 namespace Tailwind.Mail.Commands;
 
 public class ContactSignupCommand{
-  public string? Email { get; set; }
-  public string? Name { get; set; }
-  public ContactSignupCommand(string email, string name)
+  public Contact Contact { get; set; }
+  public ContactSignupCommand(Contact contact)
   {
-    Email = email;
-    Name = name; 
+    Contact = contact;
   }
   public CommandResult Execute(){
     
     using(var cmd = new Command()){
       //make sure they're not there already
       var contacts = cmd.Count("mail.contacts", new{
-        email = Email
+        email = Contact.Email
       });
 
       if(contacts > 0){
@@ -29,8 +28,8 @@ public class ContactSignupCommand{
       }  
 
       var contactId = cmd.Insert("mail.contacts", new{
-        email = Email,
-        name = Name,
+        email = Contact.Email,
+        name = Contact.Name,
         subscribed = false
       });
 

@@ -40,7 +40,7 @@ public class Command : Query, IDisposable
     var values = o.ToValueList();
     var cols = o.ToColumnList();
     var sql = $"insert into {table} ({cols}) values ({values}) returning id;";
-    //Console.WriteLine(sql);
+    
     var cmd = new NpgsqlCommand(sql).AddParams(o);
     return Run(cmd);
   }
@@ -56,7 +56,9 @@ public class Command : Query, IDisposable
   
     var sets = settings.ToSettingList();
     var sql = $"update {table} set {sets}";
-    var cmd = new NpgsqlCommand(sql).AddParams(settings).Where(where);
+    //this is reversed because we want to add the where params first
+    //otherwise the value list gets screwed up
+    var cmd = new NpgsqlCommand(sql).Where(where).AddParams(settings);
     return Run(cmd);
   }
 
@@ -83,7 +85,12 @@ public class Command : Query, IDisposable
     cmd.Connection = _conn;
     cmd.Transaction = _tx;
     //Console.WriteLine(cmd.CommandText);
-
+    Console.WriteLine(cmd.CommandText);
+    
+    foreach (NpgsqlParameter p in cmd.Parameters)
+    {
+      Console.WriteLine($"{p.ParameterName} = {p.Value}");
+    }
     if(cmd.CommandText.Contains("returning")){
       var result = cmd.ExecuteScalar();
       if(result is null){

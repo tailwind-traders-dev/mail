@@ -61,12 +61,18 @@ public static class CommandExtensions
   public static NpgsqlCommand AddParams(this NpgsqlCommand cmd, object o){
     var expando = o.ToExpando();
     var values = (IDictionary<string, object>)expando;
+    return AddParamsDictionary(cmd, values);
+  }
+  public static NpgsqlCommand AddParamsDictionary(this NpgsqlCommand cmd, IDictionary<string, object> values){
     if (values != null)
     {
       foreach (var item in values)
       {
-        //Console.WriteLine($"{item.Key} = {item.Value}");
-        cmd.Parameters.AddWithValue(item.Key, item.Value);
+        if(item.Value != null){
+          cmd.Parameters.AddWithValue(item.Key, item.Value);
+          //Console.WriteLine($"{item.Key} = {item.Value}");
+        }
+        
       }
     }
     return cmd;
@@ -77,8 +83,11 @@ public static class CommandExtensions
   {
     var expando = o.ToExpando();
     var parameters = (IDictionary<string, object>)expando;
-    cmd.CommandText += $" where {string.Join(" and ", parameters.Keys.Select(k => $"{k}=@{k}"))}";
+    //var keys = parameters.Keys.Where(k => k != null).Select(k => $"{k}=@{k}");
     cmd.AddParams(o);
+    var keys = cmd.Parameters.Select(p => $"{p.ParameterName}=@{p.ParameterName}");
+    cmd.CommandText += $" where {string.Join(" and ", keys)}";
+    
     return cmd;
   }
   public static NpgsqlCommand Limit(this NpgsqlCommand cmd, int limit)
