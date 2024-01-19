@@ -139,7 +139,7 @@ func (Deploy) Storage(resourceGroup string) error {
 		"--resource-group",
 		resourceGroup,
 		"--template-file",
-		"deploy/azure-storage/main.bicep",
+		"deploy/azure-data/main.bicep",
 		"--parameters",
 		"deployPostgres=false",
 	}
@@ -156,7 +156,7 @@ func (Deploy) StorageAndPostgres(resourceGroup string) error {
 		"--resource-group",
 		resourceGroup,
 		"--template-file",
-		"deploy/azure-storage/main.bicep",
+		"deploy/azure-data/main.bicep",
 		"--parameters",
 		"deployPostgres=true",
 	}
@@ -189,7 +189,7 @@ func (Deploy) RBAC(resourceGroup string) error {
 		"--resource-group",
 		resourceGroup,
 		"--template-file",
-		"deploy/azure-storage/rbac.bicep",
+		"deploy/azure-data/rbac.bicep",
 		"--parameters",
 		"principalID=" + principalID,
 	}
