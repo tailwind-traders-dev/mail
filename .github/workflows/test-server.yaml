@@ -61,6 +61,11 @@ jobs:
 
           cd server
 
+          cat >.env <<EOL
+          ASPNETCORE_ENVIRONMENT=Development
+          DATABASE_URL=Host=localhost;Database=tailwind;Username=user;
+          EOL
+
           make test
 
           docker rm -f postgres
