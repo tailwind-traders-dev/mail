@@ -3,6 +3,7 @@ param app_name string = 'my-container-app'
 param app_image string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
 param job_name string = 'my-container-job'
 param job_image string = 'ghcr.io/tailwind-traders-dev/jobs:latest'
+@secure()
 param service_bus_connection string = ''
 param app_queue_name string = 'tailwind'
 param job_queue_name string = 'tailwind-job'
