@@ -57,6 +57,7 @@ jobs:
           sleep 5
 
           export PGHOST=localhost
+          export PGUSER=user
 
           cd server
 
