@@ -32,7 +32,21 @@ jobs:
           # Semantic version range syntax or exact version of a dotnet version
           dotnet-version: '8.x'
       -
-        name: Check .NET version
+        name: Test server
         shell: bash
         run: |
-          dotnet --version
+          docker run --rm \
+            -p 5432:5432 \
+            -e POSTGRES_USER=user \
+            -e POSTGRES_HOST_AUTH_METHOD=trust \
+            -e POSTGRES_DB=tailwind \
+            --name postgres \
+            -d postgres
+
+          export PGHOST=localhost
+
+          cd server
+
+          make test
+
+          docker rm -f postgres
