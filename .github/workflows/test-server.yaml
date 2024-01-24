@@ -48,8 +48,8 @@ jobs:
               sleep 1;
           done;
 
-          until [ "`docker inspect -f {{.State.Health.Status}} postgres`" = "healthy" ]; do
-              echo "waiting for postgres container to be healthy...";
+          until [ "`docker inspect -f {{.State.Status}} postgres`" = "running" ]; do
+              echo "waiting for postgres container to be running...";
               sleep 1;
           done;
 
