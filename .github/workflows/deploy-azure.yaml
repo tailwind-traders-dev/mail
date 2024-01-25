@@ -34,6 +34,7 @@ jobs:
         uses: magefile/mage-action@v3
         with:
           version: latest
-          args: deploy:group 240100-tailwind-traders eastus
+          #args: deploy:group 240100-tailwind-traders eastus
+          args: deploy:storageandpostgres 240100-tailwind-traders-data
           workdir: jobs
           install_only: false
