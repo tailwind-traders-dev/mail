@@ -3,7 +3,6 @@ using System.Diagnostics.Contracts;
 using System.Dynamic;
 using System.Runtime.InteropServices;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 
 

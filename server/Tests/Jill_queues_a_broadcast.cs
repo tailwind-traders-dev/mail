@@ -5,6 +5,9 @@ using Markdig;
 
 namespace Tailwind.Mail.Tests;
 
+//probably end up mocking this at some point
+//for now, just use the test db
+
 public class BroadCastTestCommand{
   
   public string Html { get; set; }

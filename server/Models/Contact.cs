@@ -2,6 +2,12 @@
 
 namespace Tailwind.Mail.Models;
 
+public class SignUpRequest
+{
+  public string Name { get; set; }
+  public string Email { get; set; }
+}
+
 public class Contact
 {
   public string Name { get; set; }

@@ -1,12 +1,17 @@
 using Tailwind.Data;
 using Tailwind.Mail.Models;
+using Tailwind.Mail.Queries;
 
 namespace Tailwind.Mail.Commands;
 
 public class ContactOptOutCommand{
   public Contact Contact { get; set; }
-  public ContactOptOutCommand(Contact contact)
+  public ContactOptOutCommand(string key)
   {
+    var contact = new ContactQuery{
+      Key = key
+    }.First();
+    if(contact == null) throw new Exception("Contact not found");
     Contact = contact;
   }
   public CommandResult Execute(){

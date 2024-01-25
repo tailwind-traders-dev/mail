@@ -32,7 +32,7 @@ public class Joe_Signs_Up_Successfully{
     joe = new ContactQuery{Email="joe@test.com"}.First();
     Assert.True(joe.Subscribed);
 
-    res = new ContactOptOutCommand(joe).Execute();
+    res = new ContactOptOutCommand(joe.Key).Execute();
     Assert.Equal(1, res.Updated);
     Assert.True(res.Data.Success); 
 
