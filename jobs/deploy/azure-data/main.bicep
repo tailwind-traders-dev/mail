@@ -22,7 +22,7 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2019-05-01' =
   }
 }
 
-resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2022-01-01-preview' = {
   name: 'servicebus${rand}'
   location: location
   sku: {
@@ -32,6 +32,42 @@ resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
   }
   properties: {
     disableLocalAuth: false
+  }
+}
+
+resource serviceBusQueue1 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+  parent: serviceBus
+  name: 'queue-one'
+  properties: {
+    lockDuration: 'PT5M'
+    maxSizeInMegabytes: 1024
+    requiresDuplicateDetection: false
+    requiresSession: false
+    defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
+    deadLetteringOnMessageExpiration: false
+    duplicateDetectionHistoryTimeWindow: 'PT10M'
+    maxDeliveryCount: 10
+    autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
+    enablePartitioning: false
+    enableExpress: false
+  }
+}
+
+resource serviceBusQueue2 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-preview' = {
+  parent: serviceBus
+  name: 'queue-two'
+  properties: {
+    lockDuration: 'PT5M'
+    maxSizeInMegabytes: 1024
+    requiresDuplicateDetection: false
+    requiresSession: false
+    defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
+    deadLetteringOnMessageExpiration: false
+    duplicateDetectionHistoryTimeWindow: 'PT10M'
+    maxDeliveryCount: 10
+    autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
+    enablePartitioning: false
+    enableExpress: false
   }
 }
 
