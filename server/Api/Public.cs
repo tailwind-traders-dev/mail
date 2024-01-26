@@ -28,6 +28,17 @@ public class Public{
       return op;
     });
 
+    //this isn't implemented yet in terms of data
+    app.MapGet("/link/clicked/{key}", (string key) => {
+      var cmd = new LinkClickedCommand(key);
+      var result = cmd.Execute();
+      return result;
+    }).WithOpenApi(op => {
+      op.Summary = "Track a link click";
+      op.Description = "This adds to the stats for a given email in a broadcast or a sequence";
+      op.Parameters[0].Description = "This is the link's unique key";
+      return op;
+    });
 
     app.MapPost("/signup", ([FromBody] SignUpRequest req) => {
       var contact = new Contact{
