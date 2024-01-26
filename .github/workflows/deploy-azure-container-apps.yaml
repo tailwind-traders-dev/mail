@@ -39,5 +39,5 @@ jobs:
           version: latest
           #args: deploy:group 240100-tailwind-traders eastus
           args: deploy:containerapps 240100-tailwind-traders
-          workdir: jobs/deploy
+          workdir: deploy
           install_only: false
