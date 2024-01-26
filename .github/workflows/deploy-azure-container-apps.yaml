@@ -38,6 +38,6 @@ jobs:
         with:
           version: latest
           #args: deploy:group 240100-tailwind-traders eastus
-          args: deploy:storageandpostgres 240100-tailwind-traders
+          args: deploy:containerapps 240100-tailwind-traders
           workdir: jobs
           install_only: false
