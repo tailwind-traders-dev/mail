@@ -108,6 +108,7 @@ resource roleAssignmentKeyVault 'Microsoft.Authorization/roleAssignments@2020-08
   name: guid(containerRegistry.id, roleAssignmentKeyVaultDefinition)
   scope: keyVault
   properties: {
+    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId[roleAssignmentKeyVaultDefinition])
     principalId: managedIdentity.properties.principalId
   }
@@ -118,6 +119,7 @@ resource roleAssignmentAcr 'Microsoft.Authorization/roleAssignments@2020-08-01-p
   name: guid(containerRegistry.id, roleAssignmentAcrDefinition)
   scope: containerRegistry
   properties: {
+    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId[roleAssignmentAcrDefinition])
     principalId: managedIdentity.properties.principalId
   }
@@ -128,6 +130,7 @@ resource roleAssignmentStorageAccount 'Microsoft.Authorization/roleAssignments@2
   name: guid(storageAccount.id, roleAssignmentStorageAccountDefinition)
   scope: storageAccount
   properties: {
+    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId[roleAssignmentStorageAccountDefinition])
     principalId: managedIdentity.properties.principalId
   }
@@ -138,6 +141,7 @@ resource roleAssignmentServiceBus 'Microsoft.Authorization/roleAssignments@2020-
   name: guid(serviceBus.id, roleAssignmentServiceBusDefinition)
   scope: serviceBus
   properties: {
+    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleDefinitionId[roleAssignmentServiceBusDefinition])
     principalId: managedIdentity.properties.principalId
   }

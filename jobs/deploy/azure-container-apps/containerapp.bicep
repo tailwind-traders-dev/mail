@@ -29,10 +29,11 @@ resource containerRegistry 'Microsoft.ContainerRegistry/registries@2019-05-01' =
 }
 
 var roleAssignmentAcrPull = '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-resource roleAssignmentAcr 'Microsoft.Authorization/roleAssignments@2020-08-01-preview' = {
+resource roleAssignmentAcr 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(containerRegistry.id, roleAssignmentAcrPull)
   scope: containerRegistry
   properties: {
+    principalType: 'ServicePrincipal'
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roleAssignmentAcrPull)
     principalId: managedIdentity.properties.principalId
   }
