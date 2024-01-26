@@ -44,10 +44,10 @@ func (Deploy) ContainerApps(resourceGroup string) error {
 	return sh.RunV(cmd1[0], cmd1[1:]...)
 }
 
-// Storage deploys 5 "Storage" services via main.bicep into the
+// Data deploys 5 "Data" services via main.bicep into the
 // provided <resource group>. The services are:
 // Container Registry, Blob Storage, Service Bus, Key Vault and Postgres
-func (Deploy) Storage(resourceGroup string) error {
+func (Deploy) Data(resourceGroup string) error {
 	cmd1 := []string{
 		"az",
 		"deployment",
@@ -63,8 +63,8 @@ func (Deploy) Storage(resourceGroup string) error {
 	return sh.RunV(cmd1[0], cmd1[1:]...)
 }
 
-// StorageAndPostgres deploys Storage and Azure Database for Postgres
-func (Deploy) StorageAndPostgres(resourceGroup string) error {
+// DataAndPostgres deploys Data and Azure Database for Postgres
+func (Deploy) DataAndPostgres(resourceGroup string) error {
 	cmd1 := []string{
 		"az",
 		"deployment",

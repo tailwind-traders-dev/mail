@@ -35,6 +35,6 @@ jobs:
         with:
           version: latest
           #args: deploy:group 240100-tailwind-traders eastus
-          args: deploy:storageandpostgres 240100-tailwind-traders-data
+          args: deploy:dataandpostgres 240100-tailwind-traders-data
           workdir: deploy
           install_only: false
