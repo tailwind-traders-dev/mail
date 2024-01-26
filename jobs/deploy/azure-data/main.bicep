@@ -39,7 +39,7 @@ resource serviceBusQueue1 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
   parent: serviceBus
   name: 'queue-one'
   properties: {
-    lockDuration: 'PT5M'
+    lockDuration: 'PT1M'
     maxSizeInMegabytes: 1024
     requiresDuplicateDetection: false
     requiresSession: false
@@ -47,7 +47,6 @@ resource serviceBusQueue1 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
     deadLetteringOnMessageExpiration: false
     duplicateDetectionHistoryTimeWindow: 'PT10M'
     maxDeliveryCount: 10
-    autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
     enablePartitioning: false
     enableExpress: false
   }
@@ -57,7 +56,7 @@ resource serviceBusQueue2 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
   parent: serviceBus
   name: 'queue-two'
   properties: {
-    lockDuration: 'PT5M'
+    lockDuration: 'PT1M'
     maxSizeInMegabytes: 1024
     requiresDuplicateDetection: false
     requiresSession: false
@@ -65,7 +64,6 @@ resource serviceBusQueue2 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
     deadLetteringOnMessageExpiration: false
     duplicateDetectionHistoryTimeWindow: 'PT10M'
     maxDeliveryCount: 10
-    autoDeleteOnIdle: 'P10675199DT2H48M5.4775807S'
     enablePartitioning: false
     enableExpress: false
   }
