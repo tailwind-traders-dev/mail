@@ -43,7 +43,6 @@ resource serviceBusQueue1 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
     maxSizeInMegabytes: 1024
     requiresDuplicateDetection: false
     requiresSession: false
-    defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
     deadLetteringOnMessageExpiration: false
     duplicateDetectionHistoryTimeWindow: 'PT10M'
     maxDeliveryCount: 10
@@ -60,7 +59,6 @@ resource serviceBusQueue2 'Microsoft.ServiceBus/namespaces/queues@2022-01-01-pre
     maxSizeInMegabytes: 1024
     requiresDuplicateDetection: false
     requiresSession: false
-    defaultMessageTimeToLive: 'P10675199DT2H48M5.4775807S'
     deadLetteringOnMessageExpiration: false
     duplicateDetectionHistoryTimeWindow: 'PT10M'
     maxDeliveryCount: 10
