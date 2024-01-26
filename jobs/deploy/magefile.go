@@ -4,7 +4,10 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"os"
+	"time"
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
@@ -18,8 +21,103 @@ func (Deploy) Test(name string) error {
 	return nil
 }
 
+// ContainerApps deploys the Container App(s) via containerapp.bicep
+// into the provided <resource group>
+// Requires: AZURE_SERVICEBUS_CONNECTION_STRING
+func (Deploy) ContainerApps(resourceGroup string) error {
+	serviceBusConnection := os.Getenv("AZURE_SERVICEBUS_CONNECTION_STRING")
+	if serviceBusConnection == "" {
+		return errors.New("AZURE_SERVICEBUS_CONNECTION_STRING environment variable not found")
+	}
+	cmd1 := []string{
+		"az",
+		"deployment",
+		"group",
+		"create",
+		"--resource-group",
+		resourceGroup,
+		"--template-file",
+		"azure-container-apps/containerapp.bicep",
+		"--parameters",
+		"service_bus_connection=" + serviceBusConnection,
+	}
+	return sh.RunV(cmd1[0], cmd1[1:]...)
+}
+
+// Storage deploys 5 "Storage" services via main.bicep into the
+// provided <resource group>. The services are:
+// Container Registry, Blob Storage, Service Bus, Key Vault and Postgres
+func (Deploy) Storage(resourceGroup string) error {
+	cmd1 := []string{
+		"az",
+		"deployment",
+		"group",
+		"create",
+		"--resource-group",
+		resourceGroup,
+		"--template-file",
+		"azure-data/main.bicep",
+		"--parameters",
+		"deployPostgres=false",
+	}
+	return sh.RunV(cmd1[0], cmd1[1:]...)
+}
+
+// StorageAndPostgres deploys Storage and Azure Database for Postgres
+func (Deploy) StorageAndPostgres(resourceGroup string) error {
+	cmd1 := []string{
+		"az",
+		"deployment",
+		"group",
+		"create",
+		"--resource-group",
+		resourceGroup,
+		"--template-file",
+		"azure-data/main.bicep",
+		"--parameters",
+		"deployPostgres=true",
+	}
+	return sh.RunV(cmd1[0], cmd1[1:]...)
+}
+
+// RBAC deploys Role Based Access Control using rbac.bicep
+// with the principalID of the currently signed in user
+func (Deploy) RBAC(resourceGroup string) error {
+	cmd1 := []string{
+		"az",
+		"ad",
+		"signed-in-user",
+		"show",
+		"--query",
+		"id",
+		"--out",
+		"tsv",
+	}
+	principalID, err := sh.Output(cmd1[0], cmd1[1:]...)
+	if err != nil {
+		return err
+	}
+
+	cmd2 := []string{
+		"az",
+		"deployment",
+		"group",
+		"create",
+		"--resource-group",
+		resourceGroup,
+		"--template-file",
+		"azure-data/rbac.bicep",
+		"--parameters",
+		"principalID=" + principalID,
+	}
+	return sh.RunV(cmd2[0], cmd2[1:]...)
+}
+
 // Empty empties the <resource group> via empty.bicep
 func (Deploy) Empty(resourceGroup string) error {
+	fmt.Printf("Emptying Resource Group (%s) in 10 seconds.\n", resourceGroup)
+	time.Sleep(time.Second * 10)
+
 	cmd1 := []string{
 		"az",
 		"deployment",
@@ -30,7 +128,7 @@ func (Deploy) Empty(resourceGroup string) error {
 		"--mode",
 		"Complete",
 		"--template-file",
-		"deploy/azure-container-apps/empty.bicep",
+		"azure-container-apps/empty.bicep",
 	}
 	return sh.RunV(cmd1[0], cmd1[1:]...)
 }
