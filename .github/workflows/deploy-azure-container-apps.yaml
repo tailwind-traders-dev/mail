@@ -1,7 +1,8 @@
 name: Deploy azure-container-apps
+
 on:
-  push:
-    branches: ['latest']
+  #push:
+  #  branches: ['latest']
   workflow_dispatch:
 
 permissions:

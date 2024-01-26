@@ -1,8 +1,8 @@
 name: Deploy azure-data
 
 on:
-  push:
-    branches: ['latest']
+  #push:
+  #  branches: ['latest']
   workflow_dispatch:
 
 permissions:
