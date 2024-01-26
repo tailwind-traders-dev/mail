@@ -5,8 +5,8 @@ param job_name string = 'my-container-job'
 param job_image string = 'ghcr.io/tailwind-traders-dev/mail-jobs:latest'
 @secure()
 param service_bus_connection string = ''
-param app_queue_name string = 'tailwind'
-param job_queue_name string = 'tailwind-job'
+param app_queue_name string = 'queue-one'
+param job_queue_name string = 'queue-two'
 
 param location string = resourceGroup().location
 
