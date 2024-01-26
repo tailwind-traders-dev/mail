@@ -83,13 +83,13 @@ public class Command : Query, IDisposable
   {
     cmd.Connection = _conn;
     cmd.Transaction = _tx;
-    //Console.WriteLine(cmd.CommandText);
-    Console.WriteLine(cmd.CommandText);
+
+    // Console.WriteLine(cmd.CommandText);
     
-    foreach (NpgsqlParameter p in cmd.Parameters)
-    {
-      Console.WriteLine($"{p.ParameterName} = {p.Value}");
-    }
+    // foreach (NpgsqlParameter p in cmd.Parameters)
+    // {
+    //   Console.WriteLine($"{p.ParameterName} = {p.Value}");
+    // }
     if(cmd.CommandText.Contains("returning")){
       var result = cmd.ExecuteScalar();
       if(result is null){

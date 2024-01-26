@@ -12,9 +12,17 @@ public class Broadcast {
   public string Status { get; set; } = "pending";
   public string? Name { get; set; }
   public string? ReplyTo { get; set; }
+  public string SendToTag { get; set; } = "*";
   public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
   public Broadcast()
   {
     
+  }
+  public Broadcast(string markdownEmailPath)
+  {
+    var doc = new MarkdownEmail(markdownEmailPath);
+    this.Email = new Email(doc);
+    this.Name = this.Email.Subject;
+    this.SendToTag = doc.Data.SendToTag;
   }
 }

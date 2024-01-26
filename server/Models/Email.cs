@@ -1,17 +1,27 @@
+using Markdig;
+
 namespace Tailwind.Mail.Models;
 
 public class Email{
   public int? ID { get; set; }
   public string Slug { get; set; }
   public string Subject { get; set; }
-  public string? Preview { get; set; }
+  public string Preview { get; set; }
   public int DelayHours { get; set; }=0;
-  public string? Markdown { get; set; }
-  public string? Html { get; set; }
+  public string Html { get; set; }
   public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
-  public Email(string slug, string subject)
+  public Email(MarkdownEmail doc)
   {
-    Slug = slug;
-    Subject = subject;
+    //check this again
+    if(doc.Data == null){
+      throw new InvalidDataException("Markdown document should contain Slug, Subject, and Summary at least");
+    }
+    if(doc.Html == null){
+      throw new InvalidDataException("There should be HTML generated from the markdown document");
+    }
+    Slug = doc.Data.Slug;
+    Subject = doc.Data.Subject;
+    Preview = doc.Data.Summary;
+    Html = doc.Html;
   }
 }

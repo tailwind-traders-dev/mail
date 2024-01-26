@@ -62,7 +62,6 @@ create table emails(
   subject text not null,
   preview text,
   delay_hours int not null default 0,
-  markdown text,
   html text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

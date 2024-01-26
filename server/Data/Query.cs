@@ -63,7 +63,6 @@ public class Query {
   {
     var sql = $"select * from {table}";
     var cmd = new NpgsqlCommand(sql).Where(where);
-    Console.WriteLine(cmd.CommandText);
     return Run(cmd);
   }
   dynamic Run(NpgsqlCommand cmd)
@@ -73,12 +72,12 @@ public class Query {
     if(_tx != null){
       cmd.Transaction = _tx;
     }
-    Console.WriteLine(cmd.CommandText);
+    // Console.WriteLine(cmd.CommandText);
     
-    foreach (NpgsqlParameter p in cmd.Parameters)
-    {
-      Console.WriteLine($"{p.ParameterName} = {p.Value}");
-    }
+    // foreach (NpgsqlParameter p in cmd.Parameters)
+    // {
+    //   Console.WriteLine($"{p.ParameterName} = {p.Value}");
+    // }
 
     using(var rdr = cmd.ExecuteReader()){
       var results = rdr.ToExpandoList();

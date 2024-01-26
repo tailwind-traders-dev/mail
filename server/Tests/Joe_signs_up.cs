@@ -8,11 +8,12 @@ using Tailwind.Mail.Models;
 public class Joe_Signs_Up_Successfully{
     
   [Fact]
-  public void When_joe_registers_he_is_given_a_key_and_not_subbed()
+  public void When_jim_registers_he_is_given_a_key_and_not_subbed()
   {
+
     var joe = new Contact{
-      Email = "joe@test.com",
-      Name="Joe"
+      Email = "jim@test.com",
+      Name="Jim"
     };
     var res = new ContactSignupCommand(joe).Execute();
     Assert.Equal(1, res.Inserted);
@@ -24,8 +25,13 @@ public class Joe_Signs_Up_Successfully{
   //and Xunit won't do that
   public void Joe_confirms_he_is_subbed_then_unsubs()
   {
-    var joe = new ContactQuery{Email="joe@test.com"}.First();
-    var res = new ContactOptinCommand(joe).Execute();
+    var joe = new Contact{
+      Email = "joe@test.com",
+      Name="Joe"
+    };
+    var res = new ContactSignupCommand(joe).Execute();
+    joe = new ContactQuery{Email="joe@test.com"}.First();
+    res = new ContactOptinCommand(joe).Execute();
     Assert.Equal(1, res.Updated);
     Assert.True(res.Data.Success);
 

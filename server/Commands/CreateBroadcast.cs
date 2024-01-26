@@ -1,38 +1,33 @@
 using Tailwind.Data;
+using Tailwind.Mail.Models;
 
 namespace Tailwind.Mail.Commands;
 
 
 public class CreateBroadcast
 {
-  public string Slug { get; set; }
-  public int EmailId { get; set; }
-  public int TagId { get; set; }
-
-  public CreateBroadcast(string slug, int emailId, int sendToTagId=0)
+  private Broadcast _broadcast { get; set; }
+  public CreateBroadcast(Broadcast broadcast)
   {
-    Slug = slug;
-    EmailId = emailId;
-    TagId = sendToTagId;
-  }
+    _broadcast = broadcast;
+  } 
+
   public CommandResult Execute(){
 
     using(var cmd = new Command()){
 
-      //pull the email
-      var email = cmd.First("mail.emails", new{
-        id = EmailId
+      //save the email
+      var emailId = cmd.Insert("mail.emails", new{
+        slug = _broadcast.Email.Slug,
+        subject = _broadcast.Email.Subject,
+        html = _broadcast.Email.Html
       });
-      
-      if(email == null){
-        throw new InvalidOperationException("Email not found");
-      }
 
       //create the broadcast
       var broadcastId = cmd.Insert("mail.broadcasts", new{
-        slug = Slug,
-        email_id = EmailId,
-        name = email.subject
+        slug = _broadcast.Email.Slug,
+        email_id = emailId,
+        name = _broadcast.Email.Subject
       });
 
       //create the messages - glorious sql, isn't it?
@@ -51,36 +46,41 @@ public class CreateBroadcast
       if(String.IsNullOrEmpty(from)){
         from="noreply@tailwind.dev";
       }
-      if(TagId != 0){
+
+      if(_broadcast.SendToTag != "*"){
         sql += @"
         inner join mail.tagged on mail.tagged.contact_id = mail.contacts.id
         inner join mail.tags on mail.tags.id = mail.tagged.tag_id
         where subscribed = true
-        and tags.id = @tagId";
+        and tags.slug = @tagId
+        or tags.name = @tagId
+        ";
+        Console.WriteLine(sql);
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
-          TagId,
-          slug = Slug,
+          tagId = _broadcast.SendToTag,
+          slug = _broadcast.Email.Slug,
           reply_to = from,
-          subject = email.subject,
-          html = email.html
+          subject = _broadcast.Email.Subject,
+          html = _broadcast.Email.Html
         });
       }else{
         sql+="where subscribed = true";
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
-          slug = Slug,
+          slug = _broadcast.Email.Slug,
           reply_to = from,
-          subject = email.subject,
-          html = email.html
+          subject = _broadcast.Email.Subject,
+          html = _broadcast.Email.Html
         });
       }
       
-      cmd.Notify("broadcasts", Slug);
+      cmd.Notify("broadcasts", _broadcast.Email.Slug);
 
       return new CommandResult{
         Data = new{
           BroadcastId = broadcastId,
+          EmailId = emailId,
           Notified = true
         },
         Inserted = messagesCreated
