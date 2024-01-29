@@ -58,16 +58,10 @@ jobs:
 
           export PGHOST=localhost
           export PGUSER=user
-
-          cd server
-
-          cat >.env <<EOL
-          ASPNETCORE_ENVIRONMENT=Development
-          DATABASE_URL=Host=localhost;Database=tailwind;Username=user;
-          EOL
-
           export DATABASE_URL='Host=localhost;Database=tailwind;Username=user;'
 
+          cd server
+          
           make test
 
           docker rm -f postgres
