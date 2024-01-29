@@ -1,10 +1,12 @@
 param env_name string = 'my-environment'
 param app_name string = 'my-container-app'
-param app_image string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param app_image string = 'ghcr.io/tailwind-traders-dev/mail-server:latest'
 param job_name string = 'my-container-job'
 param job_image string = 'ghcr.io/tailwind-traders-dev/mail-jobs:latest'
 @secure()
 param service_bus_connection string = ''
+@secure()
+param app_database_url string = ''
 param app_queue_name string = 'queue-one'
 param job_queue_name string = 'queue-two'
 
@@ -93,6 +95,12 @@ resource app 'Microsoft.App/containerApps@2022-06-01-preview' = {
           identity: managedIdentity.id
         }
       ]
+      secrets: [
+        {
+          name: 'app-database-url'
+          value: app_database_url
+        }
+      ]
     }
     template: {
       containers: [
@@ -103,6 +111,12 @@ resource app 'Microsoft.App/containerApps@2022-06-01-preview' = {
             cpu: json('0.5')
             memory: '1.0Gi'
           }
+          env: [
+            {
+              name: 'DATABASE_URL'
+              secretRef: 'app-database-url'
+            }
+          ]
         }
       ]
       scale: {
