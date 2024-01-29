@@ -7,11 +7,11 @@ WORKDIR /app
 
 # Copy csproj and restore
 COPY *.csproj ./
-RUN dotnet restore "mail.csproj"
+RUN dotnet restore "Tailwind.Mail.csproj"
 
 # Copy everything else and build the project
 COPY . ./
-RUN dotnet publish "mail.csproj" -c Release -o out
+RUN dotnet publish "Tailwind.Mail.csproj" -c Release -o out
 
 # Use Microsoft's official runtime .NET image.
 # https://hub.docker.com/_/microsoft-dotnet-aspnet/
@@ -24,4 +24,4 @@ COPY --from=build /app/out ./
 ENV ASPNETCORE_URLS http://*:80
 
 # Start the app
-ENTRYPOINT ["dotnet", "mail.dll"]
+ENTRYPOINT ["dotnet", "Tailwind.Mail.dll"]
