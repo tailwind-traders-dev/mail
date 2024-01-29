@@ -34,6 +34,7 @@ jobs:
         uses: magefile/mage-action@v3
         env:
           AZURE_SERVICEBUS_CONNECTION_STRING: ${{ secrets.AZURE_SERVICEBUS_CONNECTION_STRING }}
+          APP_DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
           
         with:
           version: latest

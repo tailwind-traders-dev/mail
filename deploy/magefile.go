@@ -29,6 +29,10 @@ func (Deploy) ContainerApps(resourceGroup string) error {
 	if serviceBusConnection == "" {
 		return errors.New("AZURE_SERVICEBUS_CONNECTION_STRING environment variable not found")
 	}
+	databaseURL := os.Getenv("APP_DATABASE_URL")
+	if databaseURL == "" {
+		return errors.New("APP_DATABASE_URL environment variable not found")
+	}
 	cmd1 := []string{
 		"az",
 		"deployment",
@@ -40,6 +44,7 @@ func (Deploy) ContainerApps(resourceGroup string) error {
 		"azure-container-apps/containerapp.bicep",
 		"--parameters",
 		"service_bus_connection=" + serviceBusConnection,
+		"app_database_url=" + databaseURL,
 	}
 	return sh.RunV(cmd1[0], cmd1[1:]...)
 }
