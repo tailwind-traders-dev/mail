@@ -4,7 +4,7 @@ TEST_DB="Host=localhost;Database=tailwind;Username=rob;"
 
 
 test: db seed
-	dotnet test
+	dotnet test Tailwind.Mail.csproj
 
 db:
 	psql tailwind < ../db/db.sql --quiet
