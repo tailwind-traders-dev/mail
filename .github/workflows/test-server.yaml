@@ -66,6 +66,8 @@ jobs:
           DATABASE_URL=Host=localhost;Database=tailwind;Username=user;
           EOL
 
+          export DATABASE_URL='Host=localhost;Database=tailwind;Username=user;'
+
           make test
 
           docker rm -f postgres
