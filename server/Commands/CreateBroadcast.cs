@@ -55,7 +55,7 @@ public class CreateBroadcast
         and tags.slug = @tagId
         or tags.name = @tagId
         ";
-        Console.WriteLine(sql);
+
         messagesCreated = cmd.Exec(sql, new{
           broadcastId,
           tagId = _broadcast.SendToTag,
