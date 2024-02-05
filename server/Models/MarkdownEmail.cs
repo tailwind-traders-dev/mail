@@ -11,10 +11,25 @@ public class MarkdownEmail{
   public string? Html { get; set; }
   public dynamic? Data { get; set; }
   public List<string> Tags { get; set; } = new List<string>();
-  public MarkdownEmail(string path)
+  public MarkdownEmail()
   {
-    Markdown = File.ReadAllText(path);
-    this.Render();
+
+  }
+  public static MarkdownEmail FromFile(string path){
+    var email = new MarkdownEmail();
+    email.Markdown = File.ReadAllText(path);
+    email.Render();
+    return email;
+  } 
+  public static MarkdownEmail FromString(string markdown){
+    var email = new MarkdownEmail();
+    email.Markdown = markdown;
+    email.Render();
+    return email;
+  }
+  public bool IsValid(){
+    if(Data == null) return false;
+    return Data.Subject != null && Data.Summary != null;
   }
   private void Render(){
     if(Markdown == null){
@@ -34,12 +49,6 @@ public class MarkdownEmail{
       //dyamic acti0n
       Data = yamler.Deserialize<ExpandoObject>(parser);
       parser.Consume<DocumentEnd>();
-    }
-
-
-    //ensure we have a slug, subject and summary
-    if(Data.Subject == null || Data.Summary == null){
-      throw new InvalidDataException("Markdown document should contain Name, Subject, and Summary at least");
     }
     var expando = (IDictionary<string, object>)Data;
     if(!expando.ContainsKey("Slug")){

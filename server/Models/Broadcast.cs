@@ -20,7 +20,7 @@ public class Broadcast {
   }
   public Broadcast(string markdownEmailPath)
   {
-    var doc = new MarkdownEmail(markdownEmailPath);
+    var doc = MarkdownEmail.FromFile(markdownEmailPath);
     this.Email = new Email(doc);
     this.Name = this.Email.Subject;
     this.SendToTag = doc.Data.SendToTag;

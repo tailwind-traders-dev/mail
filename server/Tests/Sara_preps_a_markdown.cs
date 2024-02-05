@@ -17,7 +17,7 @@ public class Sara_preps_a_markdown_email:TestBase
     //get the markdown file in the helpers directory
     //I suck at .NET... how do I get the path to the test file?
     var path = Path.Combine(Directory.GetCurrentDirectory(), "../../../Tests/Helpers", "test_broadcast.md");
-    _doc = new MarkdownEmail(path);
+    _doc = MarkdownEmail.FromFile(path);
   }
   [Fact]
   public void Given_a_markdown_file()

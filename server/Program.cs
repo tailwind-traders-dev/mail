@@ -41,6 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 Tailwind.Mail.Api.Public.MapRoutes(app);
+Tailwind.Mail.Api.Admin.MapRoutes(app);
 
 app.Run();
 
