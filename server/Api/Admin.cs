@@ -8,6 +8,7 @@ namespace Tailwind.Mail.Api;
 public class ValidationResponse{
   public bool Valid { get; set; }
   public string Message { get; set; }
+  public long Contacts { get; set; }
   public MarkdownEmail? Data { get; set; }
   public ValidationResponse()
   {
@@ -47,11 +48,16 @@ public class Admin{
           Data = doc
         };
       }
+      var broadcast = Broadcast.FromMarkdownEmail(doc);
+      //how many contacts?
+      var contacts = broadcast.ContactCount();
       //ensure that it has a subject, summary, and slug
       var response = new ValidationResponse{
         Valid = true,
-        Data = doc
+        Data = doc,
+        Contacts = contacts
       };
+
       return response;
     }).WithOpenApi(op => {
       op.Summary = "Validate the markdown for an email";

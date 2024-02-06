@@ -1,3 +1,6 @@
+using Tailwind.Data;
+using Tailwind.Mail.Queries;
+
 namespace Tailwind.Mail.Models;
 
 //The process of creating a broadcast is:
@@ -14,9 +17,24 @@ public class Broadcast {
   public string? ReplyTo { get; set; }
   public string SendToTag { get; set; } = "*";
   public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
-  public Broadcast()
+  private Broadcast()
   {
     
+  }
+  public static Broadcast FromMarkdownEmail(MarkdownEmail doc){
+    var broadcast = new Broadcast();
+    broadcast.Email = new Email(doc);
+    broadcast.Name = broadcast.Email.Subject;
+    broadcast.SendToTag = doc.Data.SendToTag;
+    return broadcast;
+  }
+  public static Broadcast FromMarkdown(string markdown){
+    var broadcast = new Broadcast();
+    var doc = MarkdownEmail.FromString(markdown);
+    broadcast.Email = new Email(doc);
+    broadcast.Name = broadcast.Email.Subject;
+    broadcast.SendToTag = doc.Data.SendToTag;
+    return broadcast;
   }
   public Broadcast(string markdownEmailPath)
   {
@@ -24,5 +42,23 @@ public class Broadcast {
     this.Email = new Email(doc);
     this.Name = this.Email.Subject;
     this.SendToTag = doc.Data.SendToTag;
+  }
+  public long ContactCount(){
+    //do we have a tag?
+    long contacts = 0;
+    if(SendToTag == "*"){
+      contacts = new Query().Count("mail.contacts");
+    }else{
+      var sql = @"
+        select count(1) as count from mail.contacts 
+        inner join mail.tagged on mail.tagged.contact_id = mail.contacts.id
+        inner join mail.tags on mail.tags.id = mail.tagged.tag_id
+        where subscribed = true
+        and tags.slug = @tagId
+        or tags.name = @tagId
+      ";
+      contacts = new Query().Raw(sql, new{tagId = SendToTag});
+    }
+    return contacts;
   }
 }
