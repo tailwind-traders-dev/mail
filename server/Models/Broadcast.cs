@@ -57,7 +57,8 @@ public class Broadcast {
         and tags.slug = @tagId
         or tags.name = @tagId
       ";
-      contacts = new Query().Raw(sql, new{tagId = SendToTag});
+      var res = new Query().Raw(sql, new{tagId = SendToTag});
+      contacts = res.count;
     }
     return contacts;
   }

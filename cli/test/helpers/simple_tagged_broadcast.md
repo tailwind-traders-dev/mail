@@ -1,7 +1,8 @@
 --- 
-Subject: "Test X Broadcast"
+Subject: "Test Broadcast"
 SendAt: 2028-02-02
 Summary: "This is a test email and this will show up in the preview area"
+SendToTag: test-tag
 ---
 
 # Hello To The Test!
