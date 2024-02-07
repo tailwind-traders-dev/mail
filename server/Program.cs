@@ -13,16 +13,15 @@ builder.Services.AddSwaggerGen(options =>
         Version = "0.0.1",
         Title = "Tailwind Traders Mail Services API",
         Description = "Transactional and bulk email sending services for Tailwind Traders.",
-        TermsOfService = new Uri("https://example.com/terms"),
         Contact = new OpenApiContact
         {
-            Name = "Example Contact",
-            Url = new Uri("https://example.com/contact")
+            Name = "Rob Conery, Aaron Wislang, and the Tailwind Traders Team",
+            Url = new Uri("https://tailwindtraders.dev")
         },
         License = new OpenApiLicense
         {
-            Name = "Example License",
-            Url = new Uri("https://example.com/license")
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/license/mit/")
         }
     });
 });
@@ -30,15 +29,12 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
 
 Tailwind.Mail.Api.Public.MapRoutes(app);
 Tailwind.Mail.Api.Admin.MapRoutes(app);
