@@ -73,6 +73,7 @@ create table broadcasts(
   slug text not null unique,
   status text not null default 'pending',
   name text not null,
+  send_to_tag text,
   reply_to text not null default 'noreply@tailwindtraders.dev',
   created_at timestamptz not null default now(),
   processed_at timestamptz

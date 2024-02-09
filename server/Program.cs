@@ -1,5 +1,6 @@
 
 using Microsoft.OpenApi.Models;
+using Tailwind.Data;
 
 //load up the config from env and appsettings
 Viper.Config();
@@ -35,10 +36,10 @@ app.UseSwaggerUI(options =>
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
     options.RoutePrefix = string.Empty;
 });
-
-Tailwind.Mail.Api.PublicRoutes.MapRoutes(app);
-Tailwind.Mail.Api.Admin.BroadcastRoutes.MapRoutes(app);
-Tailwind.Mail.Api.Admin.ContactRoutes.MapRoutes(app);
+var conn = DB.Postgres();
+Tailwind.Mail.Api.PublicRoutes.MapRoutes(app, conn);
+Tailwind.Mail.Api.Admin.BroadcastRoutes.MapRoutes(app, conn);
+Tailwind.Mail.Api.Admin.ContactRoutes.MapRoutes(app, conn);
 
 app.Run();
 

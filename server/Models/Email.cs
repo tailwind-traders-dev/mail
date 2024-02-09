@@ -1,7 +1,8 @@
 using Markdig;
-
+using Dapper;
 namespace Tailwind.Mail.Models;
 
+[Table("emails", Schema = "mail")]
 public class Email{
   public int? ID { get; set; }
   public string Slug { get; set; }
@@ -9,7 +10,7 @@ public class Email{
   public string Preview { get; set; }
   public int DelayHours { get; set; }=0;
   public string Html { get; set; }
-  public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.Now;
+  public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
   public Email(MarkdownEmail doc)
   {
     //check this again

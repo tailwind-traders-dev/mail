@@ -1,3 +1,5 @@
+using System.Data;
+using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Tailwind.Data;
 using Tailwind.Mail.Commands;
@@ -7,7 +9,7 @@ namespace Tailwind.Mail.Api.Admin;
 
 public class ContactSearchResponse{
   public string? Term { get; set; }
-  public IList<Contact> Contacts { get; set; } = new List<Contact>();
+  public IEnumerable<Contact> Contacts { get; set; } = new List<Contact>();
 }
 
 public class ContactRoutes{
@@ -15,7 +17,7 @@ public class ContactRoutes{
   {
     
   }
-  public static void MapRoutes(IEndpointRouteBuilder app)
+  public static void MapRoutes(IEndpointRouteBuilder app, IDbConnection conn)
   {
     //CRUD for contacts
     //Tagging
@@ -24,16 +26,7 @@ public class ContactRoutes{
       //searches by both email and name
       var response = new ContactSearchResponse{Term = term};
       var sql = "select * from mail.contacts where email ~* @term or name ~* @term";
-      var contacts = new Query().Raw(sql);
-      foreach(var contact in contacts){
-        response.Contacts.Add(new Contact{
-          ID = contact.id,
-          Name = contact.name,
-          Email = contact.email,
-          Subscribed = contact.subscribed,
-          CreatedAt = contact.created_at
-        });
-      }
+      response.Contacts = conn.GetList<Contact>(sql, new {term});
       return response;
     }).WithOpenApi(op => {
       op.Summary = "Find one or more contacts using a fuzzy match on email or name";

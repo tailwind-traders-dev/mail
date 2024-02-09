@@ -1,4 +1,5 @@
 //API bits for the admin CLI//public endpoints for subscribe/unsubscribe
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Tailwind.Data;
 using Tailwind.Mail.Commands;
@@ -32,7 +33,7 @@ public class BroadcastRoutes{
     
   }
   //all of these routes will be protected in some way...
-  public static void MapRoutes(IEndpointRouteBuilder app)
+  public static void MapRoutes(IEndpointRouteBuilder app, IDbConnection conn)
   {
     //queue up a broadcast
 
@@ -55,8 +56,7 @@ public class BroadcastRoutes{
           Message = "Ensure there is a Body, Subject and Summary in the markdown",
         };
       }
-      var broadcast = Broadcast.FromMarkdownEmail(doc);
-      var res = new CreateBroadcast(broadcast).Execute();
+      var res = new CreateBroadcast(doc).Execute(conn);
       //ensure that it has a subject, summary, and slug
       var response = new QueueBroadcastResponse{
         Success = res.Inserted > 0,
@@ -89,7 +89,7 @@ public class BroadcastRoutes{
       }
       var broadcast = Broadcast.FromMarkdownEmail(doc);
       //how many contacts?
-      var contacts = broadcast.ContactCount();
+      var contacts = broadcast.ContactCount(conn);
       //ensure that it has a subject, summary, and slug
       var response = new ValidationResponse{
         Valid = true,

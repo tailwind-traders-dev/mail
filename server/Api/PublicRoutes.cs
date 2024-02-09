@@ -1,4 +1,5 @@
 //public endpoints for subscribe/unsubscribe
+using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using Tailwind.Mail.Commands;
 using Tailwind.Mail.Models;
@@ -7,7 +8,7 @@ namespace Tailwind.Mail.Api;
 
 public class PublicRoutes{
 
-  public static void MapRoutes(IEndpointRouteBuilder app)
+  public static void MapRoutes(IEndpointRouteBuilder app, IDbConnection conn)
   {
 
     //public routes
@@ -19,7 +20,7 @@ public class PublicRoutes{
 
     app.MapGet("/unsubscribe/{key}", (string key) => {
       var cmd = new ContactOptOutCommand(key);
-      var result = cmd.Execute();
+      var result = cmd.Execute(conn);
       return result;
     }).WithOpenApi(op => {
       op.Summary = "Unsubscribe from the mailing list";
@@ -46,7 +47,7 @@ public class PublicRoutes{
         Name = req.Name
       };
       var cmd = new ContactSignupCommand(contact);
-      var result = cmd.Execute();
+      var result = cmd.Execute(conn);
       return result;
     }).WithOpenApi(op => {
       op.Summary = "Sign up for the mailing list";

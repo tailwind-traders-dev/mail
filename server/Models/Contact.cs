@@ -1,5 +1,5 @@
 
-
+using Dapper;
 namespace Tailwind.Mail.Models;
 
 public class SignUpRequest
@@ -7,7 +7,7 @@ public class SignUpRequest
   public string Name { get; set; }
   public string Email { get; set; }
 }
-
+[Table("contacts", Schema = "mail")]
 public class Contact
 {
   public string Name { get; set; }

@@ -29,38 +29,36 @@ public class Sara_preps_a_markdown_email:TestBase
   {
     Assert.NotNull(_doc.Html);
     Assert.NotNull(_doc.Data);
-    Assert.Equal("Test Broadcast", _doc.Data.Subject);
-    Assert.Equal("test-broadcast", _doc.Data.Slug);
+    Assert.Equal("Test Broadcast XX", _doc.Data.Subject);
+    Assert.Equal("test-broadcast-xx", _doc.Data.Slug);
   }
   [Fact]
   public void A_valid_email_is_produced()
   {
     var email = new Email(_doc);
     Assert.NotNull(email);
-    Assert.Equal("Test Broadcast", email.Subject);
-    Assert.Equal("test-broadcast", email.Slug);
+    Assert.Equal("Test Broadcast XX", email.Subject);
+    Assert.Equal("test-broadcast-xx", email.Slug);
     Assert.NotNull(email.Html);
   }
   [Fact]
   public void A_valid_broadcast_is_produced()
   {
-    var path = Path.Combine(Directory.GetCurrentDirectory(), "../../../Tests/Helpers", "test_broadcast.md");
-    _broadcast = new Broadcast(path);
+    _broadcast = Broadcast.FromMarkdownEmail(_doc);
     Assert.NotNull(_broadcast);
-    Assert.NotNull(_broadcast.Email);
-    Assert.Equal("Test Broadcast", _broadcast.Email.Subject);
-    Assert.Equal("test-broadcast", _broadcast.Email.Slug);
-    Assert.NotNull(_broadcast.Email.Html);
+
+    Assert.Equal("Test Broadcast XX", _broadcast.Name);
+    Assert.Equal("test-broadcast-xx", _broadcast.Slug);
     Assert.Equal("pending", _broadcast.Status);
-    Assert.Equal("Test Broadcast", _broadcast.Name);
+
   }
   [Fact]
   public void A_valid_broadcast_is_saved_to_the_db()
   {
     var path = Path.Combine(Directory.GetCurrentDirectory(), "../../../Tests/Helpers", "test_broadcast.md");
-    _broadcast = new Broadcast(path);
-    var cmd = new CreateBroadcast(_broadcast);
-    var res = cmd.Execute();
+    var markdown = File.ReadAllText(path);
+    var mdEmail = MarkdownEmail.FromString(markdown);
+    var res = new CreateBroadcast(mdEmail).Execute(Conn);
     Assert.True(res.Inserted >= 10000);
     Assert.Equal(true, res.Data.Notified);
     
@@ -69,10 +67,10 @@ public class Sara_preps_a_markdown_email:TestBase
   public void A_valid_tagged_broadcast_is_saved_to_the_db()
   {
     var path = Path.Combine(Directory.GetCurrentDirectory(), "../../../Tests/Helpers", "test_broadcast_tagged.md");
-    _broadcast = new Broadcast(path);
-    var cmd = new CreateBroadcast(_broadcast);
-    var res = cmd.Execute();
-    Console.WriteLine(res.Inserted);
+    var markdown = File.ReadAllText(path);
+    var mdEmail = MarkdownEmail.FromString(markdown);
+    var res = new CreateBroadcast(mdEmail).Execute(Conn);
+    
     Assert.True(res.Inserted >= 10000);
     Assert.Equal(true, res.Data.Notified);
 
