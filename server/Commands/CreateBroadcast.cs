@@ -11,7 +11,8 @@ public class CreateBroadcast
   {
     _broadcast = broadcast;
   } 
-
+  
+  //TODO: Clean this up
   public CommandResult Execute(){
 
     using(var cmd = new Command()){

@@ -4,7 +4,7 @@ using Tailwind.Data;
 using Tailwind.Mail.Commands;
 using Tailwind.Mail.Models;
 
-namespace Tailwind.Mail.Api;
+namespace Tailwind.Mail.Api.Admin;
 
 public class ValidationResponse{
   public bool Valid { get; set; }
@@ -26,19 +26,24 @@ public class QueueBroadcastResponse{
   public CommandResult? Result { get; set; }
 }
 
-public class Admin{
-
+public class BroadcastRoutes{
+  private BroadcastRoutes()
+  {
+    
+  }
   //all of these routes will be protected in some way...
   public static void MapRoutes(IEndpointRouteBuilder app)
   {
     //queue up a broadcast
-    //CRUD for contacts
+
     //CRUD for email templates
     //Message queue problems - failed, bounced
     //Message queue pending
     //Broadcast summary
     //Contact stats
     //Tag stats
+
+    
     //validate a broadcast
     app.MapPost("/admin/queue-broadcast", ([FromBody] ValidationRequest req) => {
       var mardown = req.Markdown;

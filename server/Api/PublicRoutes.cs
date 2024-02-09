@@ -5,7 +5,7 @@ using Tailwind.Mail.Models;
 
 namespace Tailwind.Mail.Api;
 
-public class Public{
+public class PublicRoutes{
 
   public static void MapRoutes(IEndpointRouteBuilder app)
   {

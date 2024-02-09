@@ -36,8 +36,9 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 
-Tailwind.Mail.Api.Public.MapRoutes(app);
-Tailwind.Mail.Api.Admin.MapRoutes(app);
+Tailwind.Mail.Api.PublicRoutes.MapRoutes(app);
+Tailwind.Mail.Api.Admin.BroadcastRoutes.MapRoutes(app);
+Tailwind.Mail.Api.Admin.ContactRoutes.MapRoutes(app);
 
 app.Run();
 
