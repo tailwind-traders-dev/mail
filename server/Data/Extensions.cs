@@ -31,7 +31,6 @@ public static class StringExtensions{
       }
       return sb.ToString();
   }
-
 }
 public static class ObjectExtensions{
   public static string ToValueList(this object o)

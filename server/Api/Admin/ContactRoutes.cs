@@ -17,16 +17,17 @@ public class ContactRoutes{
   {
     
   }
-  public static void MapRoutes(IEndpointRouteBuilder app, IDbConnection conn)
+  public static void MapRoutes(IEndpointRouteBuilder app)
   {
     //CRUD for contacts
     //Tagging
     //Search
-    app.MapGet("/admin/contacts/search", ([FromQuery] string term) => {
+    app.MapGet("/admin/contacts/search", ([FromQuery] string term, [FromServices] IDb db) => {
       //searches by both email and name
       var response = new ContactSearchResponse{Term = term};
       var sql = "select * from mail.contacts where email ~* @term or name ~* @term";
-      response.Contacts = conn.GetList<Contact>(sql, new {term});
+      using var conn = db.Connect();
+      response.Contacts = conn.Query<Contact>(sql, new {term});
       return response;
     }).WithOpenApi(op => {
       op.Summary = "Find one or more contacts using a fuzzy match on email or name";

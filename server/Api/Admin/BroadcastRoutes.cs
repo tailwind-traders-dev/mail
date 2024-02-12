@@ -33,7 +33,7 @@ public class BroadcastRoutes{
     
   }
   //all of these routes will be protected in some way...
-  public static void MapRoutes(IEndpointRouteBuilder app, IDbConnection conn)
+  public static void MapRoutes(IEndpointRouteBuilder app)
   {
     //queue up a broadcast
 
@@ -46,7 +46,7 @@ public class BroadcastRoutes{
 
     
     //validate a broadcast
-    app.MapPost("/admin/queue-broadcast", ([FromBody] ValidationRequest req) => {
+    app.MapPost("/admin/queue-broadcast", ([FromBody] ValidationRequest req,  [FromServices] IDb db) => {
       var mardown = req.Markdown;
       var doc = MarkdownEmail.FromString(req.Markdown);
       //this should already be validated but...
@@ -56,6 +56,7 @@ public class BroadcastRoutes{
           Message = "Ensure there is a Body, Subject and Summary in the markdown",
         };
       }
+      using var conn = db.Connect();
       var res = new CreateBroadcast(doc).Execute(conn);
       //ensure that it has a subject, summary, and slug
       var response = new QueueBroadcastResponse{
@@ -72,7 +73,7 @@ public class BroadcastRoutes{
       return op;
     });
 
-    app.MapPost("/admin/validate", ([FromBody] ValidationRequest req) => {
+    app.MapPost("/admin/validate", ([FromBody] ValidationRequest req,  [FromServices] IDb db) => {
       if(req.Markdown == null){
         return new ValidationResponse{
           Valid = false,
@@ -89,6 +90,7 @@ public class BroadcastRoutes{
       }
       var broadcast = Broadcast.FromMarkdownEmail(doc);
       //how many contacts?
+      using var conn = db.Connect();
       var contacts = broadcast.ContactCount(conn);
       //ensure that it has a subject, summary, and slug
       var response = new ValidationResponse{

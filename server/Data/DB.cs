@@ -6,19 +6,28 @@ namespace Tailwind.Data
 {
   public class CustomResolver : SimpleCRUD.IColumnNameResolver
   {
-
-      public string ResolveColumnName(PropertyInfo propertyInfo)
-      {
-        return propertyInfo.Name.ToSnakeCase();
-      }
+    public string ResolveColumnName(PropertyInfo propertyInfo)
+    {
+      return propertyInfo.Name.ToSnakeCase();
+    }
   }
-  public class DB
+
+  public interface IDb{
+    IDbConnection Connect();
+  }
+
+  public class DB: IDb
   {
+    public IDbConnection Connect()
+    {
+      return DB.Postgres();
+    }
     public static IDbConnection Postgres()
     {
       var connectionString = Viper.Config().Get("DATABASE_URL");
+      
       if(String.IsNullOrEmpty(connectionString)){
-        throw new Exception("No DATABASE_URL found in environment");
+        throw new InvalidProgramException("No DATABASE_URL found in environment");
       }
 
       Dapper.SimpleCRUD.SetDialect(Dapper.SimpleCRUD.Dialect.PostgreSQL);

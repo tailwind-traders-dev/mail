@@ -7,6 +7,7 @@ Viper.Config();
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IDb, DB>();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -37,9 +38,9 @@ app.UseSwaggerUI(options =>
     options.RoutePrefix = string.Empty;
 });
 var conn = DB.Postgres();
-Tailwind.Mail.Api.PublicRoutes.MapRoutes(app, conn);
-Tailwind.Mail.Api.Admin.BroadcastRoutes.MapRoutes(app, conn);
-Tailwind.Mail.Api.Admin.ContactRoutes.MapRoutes(app, conn);
+Tailwind.Mail.Api.PublicRoutes.MapRoutes(app);
+Tailwind.Mail.Api.Admin.BroadcastRoutes.MapRoutes(app);
+Tailwind.Mail.Api.Admin.ContactRoutes.MapRoutes(app);
 
 app.Run();
 

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "mocha --recursive",
-    "dev": "node ./bin/mail.js"
+    "dev": "node ./bin/rat.js"
   },
   "keywords": [],
   "author": "",
