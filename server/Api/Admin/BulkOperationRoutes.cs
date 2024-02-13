@@ -29,48 +29,25 @@ public class BulkOperationRoutes{
   {
     app.MapPost("/admin/bulk/contacts/tag", ([FromBody] BulkTagRequest request, [FromServices] IDb db) => {
       using var conn = db.Connect();
-      var tx = conn.BeginTransaction();
-      var updated =0;
-      var inserted = 0;
-      try{
-        var tag = conn.GetList<Tag>(new {name=request.Tag}, tx).FirstOrDefault();
-        if(tag == null){
-          tag = new Tag(request.Tag);
-          tag.ID = conn.Insert(tag, tx);
-        }
-        foreach(var email in request.Emails){
-          var contact = conn.GetList<Contact>(new {Email = email}).FirstOrDefault();
-          if(contact == null){
-            //create the contact
-            contact = new Contact{
-              Email = email
-            };
-            inserted++;
-            contact.ID = conn.Insert(contact, tx);
-          }else{
-            updated++;
-          }
-          var sql = @"
-          insert into mail.tagged (contact_id, tag_id) 
-          values (@contactId, @tagId) 
-          on conflict do nothing"; //upsert if already tagged
-          conn.Execute(sql, new {contactId=contact.ID, tagId=tag.ID}, tx);
-        }
-        tx.Commit();
-        return new BulkTagResponse{
-          Created = inserted, 
-          Updated = updated, 
-          Success = true, 
-          Message = $"{request.Emails.Count()} contacts tagged with {request.Tag}"
-        };
-      }catch(Exception e){
-        tx.Rollback();
-        return new BulkTagResponse{
-          Success = false,
-          Message = e.Message
-        };
+      if(String.IsNullOrEmpty(request.Tag) || request.Emails.Count() == 0){
+        return new BulkTagResponse{Success = false, Message = "Be sure to include a tag and at least one email address and a tag"};
       }
-
+      //there's a chance of sending in multiple tags... so... we'll just do one at a time
+      var tags = request.Tag.Split(",");
+      var totalInserted = 0;
+      var totalUpdated = 0;
+      foreach(var tag in tags){
+        var result = new BulkTagCommand{
+          Tag = tag.Trim(),
+          Emails = request.Emails
+        }.Execute(conn);
+      }
+      return new BulkTagResponse{
+        Success = true, 
+        Created = totalInserted, 
+        Updated = totalUpdated,
+        Message = $"{tags.Count()} Tag(s) applied to {request.Emails.Count()} contacts"  
+      };
     }).WithOpenApi(op => {
       op.Summary = "Tag a set of contacts";
       op.Description = "Tag a set of contacts";
