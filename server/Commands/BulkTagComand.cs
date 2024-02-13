@@ -30,7 +30,8 @@ namespace Tailwind.Mail.Commands
             //create the contact
             contact = new Contact
             {
-              Email = email
+              Email = email,
+              Subscribed = true
             };
             inserted++;
             contact.ID = conn.Insert(contact, tx);

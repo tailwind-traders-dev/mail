@@ -13,6 +13,7 @@ You'll also want to setup (and source) a `.env` file:
 ```
 alias mail="node ./bin/mail.js"
 alias mt="npm run test"
+API_ROOT="the root url without trailing slash"
 ```
 
 This makes life easy as it emulates the CLI experience.
