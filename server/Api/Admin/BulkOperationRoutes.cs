@@ -8,8 +8,16 @@ using Tailwind.Mail.Models;
 namespace Tailwind.Mail.Api.Admin;
 
 public class BulkTagRequest{
+  public bool Success { get; set; } = false;
+  public string Message { get; set; }
   public string Tag { get; set; }
   public IEnumerable<string> Emails { get; set; }
+}
+public class BulkTagResponse{
+  public bool Success { get; set; } = false;
+  public string Message { get; set; } = "No response";
+  public int Created { get; set; }
+  public int Updated { get; set; }
 }
 
 public class BulkOperationRoutes{
@@ -49,10 +57,18 @@ public class BulkOperationRoutes{
           conn.Execute(sql, new {contactId=contact.ID, tagId=tag.ID}, tx);
         }
         tx.Commit();
-        return new CommandResult{Inserted = inserted, Updated = updated};
+        return new BulkTagResponse{
+          Created = inserted, 
+          Updated = updated, 
+          Success = true, 
+          Message = $"{request.Emails.Count()} contacts tagged with {request.Tag}"
+        };
       }catch(Exception e){
         tx.Rollback();
-        return new CommandResult{Data = new {error = e.Message}};
+        return new BulkTagResponse{
+          Success = false,
+          Message = e.Message
+        };
       }
 
     }).WithOpenApi(op => {
