@@ -7,6 +7,13 @@ public class Tag{
   public string? Slug { get; set; }
   public string? Name { get; set; }
   public string?  Description { get; set; }
+  public Tag(string name){
+    Name = name;
+    Slug = name.ToLower().Replace(" ", "-");
+  }
+  public Tag(){
+    
+  }
 }
 
 [Table("tagged", Schema = "mail")]

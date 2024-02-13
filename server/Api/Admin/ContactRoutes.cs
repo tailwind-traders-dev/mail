@@ -37,3 +37,8 @@ public class ContactRoutes{
     .Produces(500);
   }
 }
+public interface IQuantifiedList{
+  public IDictionary<string,int> Items {get; set;}
+  public bool AddItem(string sku, int quantity);
+  public bool RemoveItem(string sku, int quantity);
+}
