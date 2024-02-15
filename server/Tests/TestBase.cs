@@ -7,6 +7,7 @@ public abstract class TestBase : IDisposable
     public IDbConnection Conn { get; set; }
     protected TestBase()
     {
+      Viper.Test();
       Conn = DB.Postgres();
     }
 

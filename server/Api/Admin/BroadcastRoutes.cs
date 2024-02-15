@@ -1,6 +1,7 @@
 //API bits for the admin CLI//public endpoints for subscribe/unsubscribe
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
+using Tailwind.AI;
 using Tailwind.Data;
 using Tailwind.Mail.Commands;
 using Tailwind.Mail.Models;
@@ -20,7 +21,15 @@ public class ValidationResponse{
 public class ValidationRequest{
   public string? Markdown { get; set; }
 }
+public class ChatRequest{
+  public string? Prompt { get; set; }
+}
+public class ChatResponse{
+  public bool Success { get; set; }
+  public string? Prompt { get; set; }
+  public string? Reply { get; set; }
 
+}
 public class QueueBroadcastResponse{
   public bool Success { get; set; }
   public string? Message { get; set; }
@@ -44,7 +53,32 @@ public class BroadcastRoutes{
     //Contact stats
     //Tag stats
 
-    
+    app.MapPost("/admin/get-chat", async ([FromBody] ChatRequest req,  [FromServices] IDb db) => {
+      
+      //this should already be validated but...
+      if(req.Prompt == null){
+        return new ChatResponse{
+          Success = false,
+          Prompt = req.Prompt,
+          Reply = "Ensure there is a Subject and Prompt in the request",
+        };
+      }else{
+        var chat = new Chat();
+        var res = await chat.Prompt(req.Prompt);
+        return new ChatResponse{
+          Success = true,
+          Prompt = req.Prompt,
+          Reply = res
+        };
+      }
+
+      //return response;
+    }).WithOpenApi(op => {
+      op.Summary = "Queue a broadcast for your contacts";
+      op.Description = "This pops the messages for your broadcast into the queue and double checks the validation";
+      op.RequestBody.Description = "The markdown for the email";
+      return op;
+    });
     //validate a broadcast
     app.MapPost("/admin/queue-broadcast", ([FromBody] ValidationRequest req,  [FromServices] IDb db) => {
       var mardown = req.Markdown;

@@ -4,10 +4,11 @@ const fs = require("fs");
 const path = require("path");
 const consola = require("consola");
 const highlight = require("cli-highlight").highlight;
-const {confirm, select} = require("@inquirer/prompts");
+const {confirm, select, input} = require("@inquirer/prompts");
 const apiUrl = process.env.API_ROOT || "http://localhost:5000/admin";;
 const mailDirs = require("../lib/dirs");
 const _ = require('lodash');
+var Spinner = require('cli-spinner').Spinner;
 
 program.command("new")
   .description("Create a broadcast markdown file")
@@ -18,8 +19,36 @@ program.command("new")
       consola.error("Please be sure you have a /mail directory and a /mail/broadcasts directory. Run init to set it up.")
       return;
     }
-    //const slug = subject.replaceAll(" ","-").replaceAll(/\W/g, '').toLowerCase();
     const slug = _.kebabCase(subject);
+
+    var useAI = await confirm({
+      message: "Want to set this up with an OpenAI prompt? We can generate the body of the email for you, which you should then edit. (Y|n)",
+      default: true
+    });
+    var body = `This is the markdown body of the email, which you should change. If you want to send on a particular date, add that using 
+  SendAt" in the frontmatter. The "SendToTag" is set to everyone, but you can restrict based on one or more tag slugs, separated by a comma.`
+    if(useAI){
+      var prompt = await input({
+        message: "Enter your prompt. It can take up to 20 seconds to reply, so be patient:",
+        default: "\"What color is a moose in spring?\""
+      });
+      if(prompt){
+        const url = `${apiUrl}/get-chat`;
+        consola.info("OK, here we go... be patient...\n");
+        var Spinner = require('cli-spinner').Spinner;
+        var spin = new Spinner("talking to api... %s");
+        spin.setSpinnerString(30);
+        spin.start();
+        var res = await axios.post(url, {
+          prompt,
+        });
+        spin.stop();
+        //console.log(res.data);
+        body = res.data.reply;
+      }
+    }
+
+
     const template = `---
 Subject: "${subject}"
 Slug: "${slug}"
@@ -27,8 +56,8 @@ Summary: "Summarize the email here for the preview"
 SendToTag: "*"
 ---
 
-This is the markdown body of the email, which you should change. If you want to send on a particular date, add that using 
-SendAt" in the frontmatter. The "SendToTag" is set to everyone, but you can restrict based on one or more tag slugs, separated by a comma.`
+${body}
+`
     const docPath = path.resolve(__dirname, "./mail/broadcasts",`${slug}.md`);
     if(!fs.existsSync(docPath)){
       fs.writeFileSync(docPath, template);
