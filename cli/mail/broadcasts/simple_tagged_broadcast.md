@@ -2,7 +2,7 @@
 Subject: "Test Broadcast"
 SendAt: 2028-02-02
 Summary: "This is a test email and this will show up in the preview area"
-SendToTag: bob
+SendToTag: azure
 ---
 
 # Hello To The Test!

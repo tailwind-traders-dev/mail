@@ -11,9 +11,10 @@ You'll need Node installed. I'm using LTS 20 for this. If you need a Node versio
 You'll also want to setup (and source) a `.env` file:
 
 ```
-alias mail="node ./bin/mail.js"
+alias mdmail="node ./bin/mdmail.js"
 alias mt="npm run test"
-API_ROOT="the root url without trailing slash"
+
+API_ROOT="http://localhost:5000/admin" #dotnet watch
 ```
 
 This makes life easy as it emulates the CLI experience.
