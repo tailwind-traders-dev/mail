@@ -23,11 +23,17 @@ public class BulkEmailTest:TestBase
   }
   [Fact]
   public async void Bulk_email_sending(){
-    await _outbox.Send(new Message{
-      SendTo = "someone@test.com",
-      SendFrom = "test@test.com",
-      Subject = "Test",
-      Html = "<h1>Test</h1>"
-    });
+    List<Message> mssgs = new List<Message>();
+    for(var i = 0; i < 25; i++)
+    {
+      mssgs.Add(new Message{
+        SendTo = $"test{i}@test.com",
+        SendFrom = "thing@dev.null",
+        Subject = "Test",
+        Html = "<h1>Test</h1>",
+      });
+    }
+    var sent = await _outbox.SendBulk(mssgs);
+    
   }
 }
