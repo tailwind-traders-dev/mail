@@ -7,50 +7,64 @@ using Tailwind.Mail.Models;
 using Microsoft.EntityFrameworkCore;
 using Humanizer;
 
-public class Outbox 
-{
-
-
-  public static async Task<Message> Send(Message mssg)
+public interface IEmailSender{
+  public Task<Message> Send(Message mssg);
+}
+public class InMemoryEmailSender: IEmailSender{
+  public IEnumerable<Message> Sent { get; set; } = new List<Message>();
+  public async Task<Message> Send(Message mssg)
   {
-    if(!mssg.ReadyToSend()){
-      throw new InvalidOperationException("Message is not ready to send. Be sure status is pending, Send At is now or in the past, and all fields are filled out.");
-    }
+    mssg.Sent();
+    Sent.Append(mssg);
+    return mssg;
+  }
+}
+public class MailHogSender: IEmailSender{
+  private SmtpClient _client;
+  public MailHogSender()
+  {
+    _client = new SmtpClient("localhost", 1025);
+  }
+  public async Task<Message> Send(Message mssg)
+  {
+    var sendMessage = new MailMessage{
+      IsBodyHtml = true,
+      Subject = mssg.Subject,
+      Body = mssg.Html,
+      From= new MailAddress(mssg.SendFrom),
+    };
+    sendMessage.To.Add(new MailAddress(mssg.SendTo));
+    await _client.SendMailAsync(sendMessage);
+    mssg.Sent();
+    return mssg;
+  }
+
+}
+public class SmtpEmailSender: IEmailSender{
+  private SmtpClient _client;
+  public SmtpEmailSender()
+  {
     var config = Viper.Config();
-    var env = config.Get("ASPNETCORE_ENVIRONMENT");
-     
     var host = config.Get("SMTP_HOST");
     var user = config.Get("SMTP_USER");
     var pw = config.Get("SMTP_PASSWORD");
     var port = 465;
-    if (env == "Integration"){
-      host="smtp.ethereal.email";
-      user = config.Get("ETHEREAL_USER");
-      pw = config.Get("ETHEREAL_PASSWORD");
-      port = 587;
-    }
-    
+    _client = new SmtpClient(host, port);
+    _client.Credentials = new NetworkCredential(user, pw);
+    _client.UseDefaultCredentials = false;
+    _client.EnableSsl = true;
+  }
+  public async Task<Message> Send(Message mssg)
+  {
     var sendMessage = new MailMessage{
       IsBodyHtml = true,
       Subject = mssg.Subject,
       Body = mssg.Html,
       From=new MailAddress(mssg.SendFrom),
-      To = {new MailAddress(mssg.SendTo)}
     };
-    
-    if (env == "Integration" || env == "Production"){
-      Console.WriteLine("Sending email");
-      var _client = new SmtpClient(host, port);
-      _client.Credentials = new NetworkCredential(user, pw);
-      _client.UseDefaultCredentials = false;
-      _client.EnableSsl = true;
-      await _client.SendMailAsync(sendMessage);
-      //TODO: handle the receipt somehow!
-    }
-
-    mssg.Status = "sent";
-    mssg.SentAt = DateTimeOffset.Now;
+    sendMessage.To.Add(new MailAddress(mssg.SendTo));
+    await _client.SendMailAsync(sendMessage);
+    mssg.Sent();
     return mssg;
   }
-
 }

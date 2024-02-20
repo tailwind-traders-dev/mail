@@ -8,11 +8,53 @@ const {confirm, select, input} = require("@inquirer/prompts");
 const apiUrl = process.env.API_ROOT || "http://localhost:5000/admin";;
 const mailDirs = require("../lib/dirs");
 const _ = require('lodash');
-var Spinner = require('cli-spinner').Spinner;
+const Spinner = require('cli-spinner').Spinner;
+const parser = require("../lib/parser");
+
+const pingAI = async function(prompt){
+  const url = `${apiUrl}/get-chat`;
+  consola.info("OK, here we go... be patient...\n");
+  var Spinner = require('cli-spinner').Spinner;
+  var spin = new Spinner("talking to api... %s");
+  spin.setSpinnerString(29);
+  spin.start();
+  var res = await axios.post(url, {
+    prompt,
+  });
+  spin.stop();
+  //console.log(res.data);
+  return res.data.reply;
+}
+
+const getBroadcastFile = async function(){
+
+  const ready = mailDirs.dirsExist(__dirname);
+  if(!ready){
+    consola.error("Please be sure you have a /mail directory and a /mail/broadcasts directory. Run init to set it up.")
+    return;
+  }
+
+  const docs = getBroadcasts();
+  let file;
+  if(docs.length === 0){
+    consola.error("There are no broadcasts to regenerate. Run broadcast new to generate one.")
+    return;
+  }
+  if(docs.length > 1){
+    file = await select({
+      message: "Which broadcast?",
+      choices: docs
+    });
+    return file.name
+  }else{
+    return docs[0].name;
+  }
+}
 
 program.command("new")
   .description("Create a broadcast markdown file")
   .argument("<subject>", "The subject of the email to send. This will also create a slug, which you can change.")
+  .option("-p", "Add a prompt for AI generation.")
   .action(async function(subject){
     const ready = mailDirs.dirsExist(__dirname);
     if(!ready){
@@ -33,38 +75,28 @@ program.command("new")
         default: "\"What color is a moose in spring?\""
       });
       if(prompt){
-        const url = `${apiUrl}/get-chat`;
-        consola.info("OK, here we go... be patient...\n");
-        var Spinner = require('cli-spinner').Spinner;
-        var spin = new Spinner("talking to api... %s");
-        spin.setSpinnerString(30);
-        spin.start();
-        var res = await axios.post(url, {
-          prompt,
-        });
-        spin.stop();
-        //console.log(res.data);
-        body = res.data.reply;
+        body = await pingAI(prompt);
       }
     }
 
-
+    const addPrompt = prompt ? `\nPrompt: ${prompt}` : "";
     const template = `---
 Subject: "${subject}"
 Slug: "${slug}"
 Summary: "Summarize the email here for the preview"
-SendToTag: "*"
+SendToTag: "*"${addPrompt}
 ---
 
 ${body}
 `
     const docPath = path.resolve(__dirname, "./mail/broadcasts",`${slug}.md`);
-    if(!fs.existsSync(docPath)){
+    // if(!fs.existsSync(docPath)){
       fs.writeFileSync(docPath, template);
-      consola.success(`Your broadcast file is ready to go, and is located at /mail/broadcasts/${slug}.md`);
-    }else{
-      consola.error("This file exists already. Please delete or move by hand.")
-    }
+      consola.success(`\nYour broadcast file is ready to go, and is located at /mail/broadcasts/${slug}.md\n\n`);
+      console.log(body);
+    // }else{
+    //   consola.error("This file exists already. Please delete or move by hand.")
+    // }
 
   });
 
@@ -78,25 +110,42 @@ const getBroadcasts = function(){
   });
 }
 
+program.command("generate")
+  .description("Rebuild your email using a prompt")
+  .action(async function(){
+    let file = await getBroadcastFile();
+    const fileName = file.indexOf(".md") > 0 ? file : file+".md";
+    const docPath = path.resolve(__dirname, "./mail/broadcasts",fileName);
+    const {data, markdown} = parser.build(docPath);
+    if(!data.Prompt){
+      consola.error("Make sure there's a Prompt in the frontmatter.")
+      return;
+    }
+    const body = await pingAI(data.Prompt);
+
+    const template = `---
+Subject: "${data.Subject}"
+Slug: "${data.Slug}"
+Summary: "${data.Summary}"
+SendToTag: "*"
+Prompt: "${data.Prompt}"
+---
+
+${body}
+`
+    // if(!fs.existsSync(docPath)){
+    fs.writeFileSync(docPath, template);
+    consola.success(`\n\nOK, regenerated!\n\n`);
+    console.log(body);
+
+  })
+
 program.command("validate")
   .description("Validates the markdown doc against the API")
   //.argument("<file>", "The name of the markdown doc")
   .action(async function(){
-    //hard-coding this for now
-    const ready = mailDirs.dirsExist(__dirname);
-    if(!ready){
-      consola.error("Please be sure you have a /mail directory and a /mail/broadcasts directory. Run init to set it up.")
-      return;
-    }
-    const docs = getBroadcasts();
-    const file = await select({
-      message: "Which broadcast?",
-      choices: docs
-    });
-    if(docs.length === 0){
-      consola.error("There are no broadcasts to validate. Run broadcast new to generate one.")
-      return;
-    }
+    let file = await getBroadcastFile();
+
     const url = `${apiUrl}/validate` //using dotnet run for the server
     var fileName = file.indexOf(".md") > 0 ? file : file+".md";
     const docPath = path.resolve(__dirname, "./mail/broadcasts",fileName);
@@ -123,20 +172,7 @@ program.command("send")
   .description("Queues the broadcast for send, depending on the delay. Default is now.")
   //.argument("<file>", "The name of the markdown doc")
   .action(async function(){
-    const ready = mailDirs.dirsExist(__dirname);
-    if(!ready){
-      consola.error("Please be sure you have a /mail directory and a /mail/broadcasts directory. Run init to set it up.")
-      return;
-    }
-    const docs = getBroadcasts();
-    const file = await select({
-      message: "Which broadcast?",
-      choices: docs
-    });
-    if(docs.length === 0){
-      consola.error("There are no broadcasts to send. Run broadcast new to generate one.")
-      return;
-    }
+    let file = await getBroadcastFile();
     //hard-coding this for now
     let url = `${apiUrl}/validate` //using dotnet run for the server
     var fileName = file.indexOf(".md") > 0 ? file : file+".md";
