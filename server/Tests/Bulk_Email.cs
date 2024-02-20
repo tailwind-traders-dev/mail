@@ -17,6 +17,7 @@ namespace Tailwind.Mail.Tests;
 public class BulkEmailTest:TestBase
 {
   MailHogSender _outbox;
+  IList<Message> _queue;
   public BulkEmailTest()
   {
     _outbox = new MailHogSender();
@@ -26,14 +27,20 @@ public class BulkEmailTest:TestBase
     List<Message> mssgs = new List<Message>();
     for(var i = 0; i < 25; i++)
     {
-      mssgs.Add(new Message{
-        SendTo = $"test{i}@test.com",
+      var m = new Message{
+        SendTo = $"test{i}-bulk@test.com",
         SendFrom = "thing@dev.null",
-        Subject = "Test",
+        Subject = "Bulk Send Test",
         Html = "<h1>Test</h1>",
-      });
+        Slug = "bulk-send-test",
+        SendAt = DateTimeOffset.UtcNow
+      };
+      m.ID = await Conn.InsertAsync(m);
+      mssgs.Add(m);
     }
+    Console.WriteLine(mssgs.Count);
     var sent = await _outbox.SendBulk(mssgs);
-    
+    Console.WriteLine(sent);
+    Assert.Equal(25, sent);
   }
 }
