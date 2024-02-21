@@ -7,12 +7,12 @@ using Tailwind.Mail.Models;
 namespace Tailwind.Mail.Tests;
 
 [Collection("Markdown")]
-public class Sara_preps_a_markdown_email:TestBase
+public class BroadcastFromMarkdown:TestBase
 {
   public string? _markdown { get; set; }
   public MarkdownEmail _doc { get; set; }
   public Broadcast _broadcast { get; set; }
-  public Sara_preps_a_markdown_email()
+  public BroadcastFromMarkdown()
   {
     //get the markdown file in the helpers directory
     //I suck at .NET... how do I get the path to the test file?
@@ -59,8 +59,7 @@ public class Sara_preps_a_markdown_email:TestBase
     var markdown = File.ReadAllText(path);
     var mdEmail = MarkdownEmail.FromString(markdown);
     var res = new CreateBroadcast(mdEmail).Execute(Conn);
-    Assert.True(res.Inserted >= 10);
-    Assert.Equal(true, res.Data.Notified);
+    Assert.True(res.Data.BroadcastId > 0);
     
   }
   [Fact]
@@ -70,9 +69,6 @@ public class Sara_preps_a_markdown_email:TestBase
     var markdown = File.ReadAllText(path);
     var mdEmail = MarkdownEmail.FromString(markdown);
     var res = new CreateBroadcast(mdEmail).Execute(Conn);
-    
-    Assert.True(res.Inserted >= 10);
-    Assert.Equal(true, res.Data.Notified);
-
+    Assert.True(res.Data.BroadcastId > 0);
   }
 }

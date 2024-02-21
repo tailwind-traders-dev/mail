@@ -1,8 +1,7 @@
 	docker run -d \
-    --restart unless-stopped \
     --name=mailpit \
+    --rm \
     -p 8025:8025 \
     -p 1025:1025 \
-    axllent/mailpit
-  
-  dotnet watch
+    axllent/mailpit \
+&& dotnet watch

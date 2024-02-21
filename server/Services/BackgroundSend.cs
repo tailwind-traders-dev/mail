@@ -26,12 +26,11 @@ public class BackgroundSend : BackgroundService
       // You can use the stoppingToken to stop the task if needed.
       //get 10 pending mails at a time to send
       Console.WriteLine("Checking for email to send...");
-
-        var sql = "select * from mail.messages where status = 'pending' and send_at <= now() limit 10";
-        dynamic messages = await _conn.QueryAsync(sql);
-        var sendCount = 0;
-        foreach(var row in messages){
-          var message = new Message{
+        var messages = new List<Message>();
+        var sql = "select * from mail.messages where status = 'pending' and send_at <= now()";
+        dynamic rows = await _conn.QueryAsync(sql);
+        foreach(var row in rows){
+          messages.Add(new Message{
             ID = row.id,
             Subject = row.subject,
             Status = row.status,
@@ -40,16 +39,13 @@ public class BackgroundSend : BackgroundService
             SendAt = row.send_at,
             SendTo = row.send_to,
             SendFrom = row.send_from
-          };
-          await _outbox.Send(message);
-          sql = "update mail.messages set status = 'sent', sent_at = now() where id = @id";
-          await _conn.ExecuteAsync(sql, new {id = message.ID});
-          sendCount++;
+          });
         }
+        var sendCount = await _outbox.SendBulk(messages);
         if(sendCount > 0){
           Console.WriteLine($"Sent {sendCount} messages");
         }
-      
+      //wait a minute and keep the loop going
       await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
     }
   }

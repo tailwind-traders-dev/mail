@@ -1,7 +1,7 @@
 run:
 	. ./start.sh
 
-test: db seed
+test: db
 	dotnet test
 
 db:

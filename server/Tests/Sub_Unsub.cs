@@ -4,8 +4,8 @@ using Tailwind.Mail.Commands;
 using Tailwind.Mail.Models;
 using Dapper;
 
-[Collection("Joe Signs Up")]
-public class Joe_Signs_Up_Successfully: TestBase{
+[Collection("SubUnsub")]
+public class SubUnsub: TestBase{
     
   [Fact]
   public void When_jim_registers_he_is_given_a_key_and_not_subbed()
@@ -30,7 +30,6 @@ public class Joe_Signs_Up_Successfully: TestBase{
       Name="Joe"
     };
     var res = new ContactSignupCommand(joe).Execute(Conn);
-    Console.WriteLine(res.Data);
     joe = Conn.Get<Contact>((int)res.Data.ID);
 
     res = new ContactOptinCommand(joe).Execute(Conn);
@@ -41,7 +40,6 @@ public class Joe_Signs_Up_Successfully: TestBase{
     Assert.True(joe.Subscribed);
 
     res = new ContactOptOutCommand(joe.Key).Execute(Conn);
-    Console.WriteLine(res.Data);
     Assert.Equal(1, res.Updated);
     Assert.True(res.Data.Success); 
 
@@ -49,16 +47,18 @@ public class Joe_Signs_Up_Successfully: TestBase{
     Assert.False(joe.Subscribed);
   }
 }
-[Collection("Jack Signs Up But Is Already here")]
-public class Jack_already_exists: TestBase{
+
+public class UserAlreadyExists: TestBase{
     
   [Fact]
   public void When_jack_registers_he_we_dont_throw_but_return_false_success()
   {
     var jack = new Contact{
-      Email = "test@test.com",
-      Name="Jack"
+      Email = "jack@test.com",
+      Name="Jack",
+      Subscribed = true
     };
+    new ContactSignupCommand(jack).Execute(Conn);
     var res = new ContactSignupCommand(jack).Execute(Conn);
     Assert.Equal(0, res.Inserted);
     Assert.False(res.Data.Success);
