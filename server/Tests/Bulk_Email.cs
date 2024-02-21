@@ -25,7 +25,8 @@ public class BulkEmailTest:TestBase
   [Fact]
   public async void Bulk_email_sending(){
     List<Message> mssgs = new List<Message>();
-    for(var i = 0; i < 25; i++)
+    var limit = 1000;
+    for(var i = 0; i < limit; i++)
     {
       var m = new Message{
         SendTo = $"test{i}-bulk@test.com",
@@ -38,9 +39,8 @@ public class BulkEmailTest:TestBase
       m.ID = await Conn.InsertAsync(m);
       mssgs.Add(m);
     }
-    Console.WriteLine(mssgs.Count);
     var sent = await _outbox.SendBulk(mssgs);
     Console.WriteLine(sent);
-    Assert.Equal(25, sent);
+    Assert.Equal(limit, sent);
   }
 }

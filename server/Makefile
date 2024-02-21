@@ -7,8 +7,13 @@ db:
 seed: db
 	psql tailwind < ../db/seed.sql --quiet
 
-mailhog:
-	docker run -d -p 1025:1025 -p 8025:8025 mailhog/mailhog
+mailpit:
+	docker run -d \
+	--restart unless-stopped \
+	--name=mailpit \
+	-p 8025:8025 \
+	-p 1025:1025 \
+	axllent/mailpit
 
 
 .phony: test db seed change_1 mailhog
