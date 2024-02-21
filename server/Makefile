@@ -1,3 +1,6 @@
+run:
+	. ./start.sh
+
 test: db seed
 	dotnet test
 
